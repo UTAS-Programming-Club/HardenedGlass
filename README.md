@@ -1,2 +1,2 @@
 # Hardened Glass
-Minecraft mod to added hardened, blast resistant glass for our server.
+Minecraft mod to add hardened, blast resistant glass for our server.
