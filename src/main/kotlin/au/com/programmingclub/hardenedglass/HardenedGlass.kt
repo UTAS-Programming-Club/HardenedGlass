@@ -13,7 +13,7 @@ import net.minecraft.registry.Registries
 import net.minecraft.registry.Registry
 
 object HardenedGlass : ModInitializer {
-  private val namespace = "hardenedglass"
+  val namespace = "hardenedglass"
 
   private val HardenedGlassIdentifier = Identifier(namespace, "hardened_glass")
   public val HardenedGlassBlock = TransparentBlock(
@@ -29,6 +29,8 @@ object HardenedGlass : ModInitializer {
     // Proceed with mild caution.
     Registry.register(Registries.BLOCK, HardenedGlassIdentifier, HardenedGlassBlock)
     Registry.register(Registries.ITEM, HardenedGlassIdentifier, HardenedGlassItem)
+
+    Bacon.registerItem()
 
     ItemGroupEvents.modifyEntriesEvent(ItemGroups.COLORED_BLOCKS).register({content ->
       content.add(HardenedGlassItem)
