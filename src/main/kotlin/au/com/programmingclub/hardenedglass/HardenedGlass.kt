@@ -13,10 +13,10 @@ import net.minecraft.registry.Registries
 import net.minecraft.registry.Registry
 
 object HardenedGlass : ModInitializer {
-  private val namespace = "hardenedglass"
+  private const val namespace = "hardenedglass"
 
   private val HardenedGlassIdentifier = Identifier(namespace, "hardened_glass")
-  public val HardenedGlassBlock = TransparentBlock(
+  val HardenedGlassBlock = TransparentBlock(
     AbstractBlock.Settings.copy(GLASS)
     .hardness(10f)
     .resistance(9f)
@@ -30,8 +30,8 @@ object HardenedGlass : ModInitializer {
     Registry.register(Registries.BLOCK, HardenedGlassIdentifier, HardenedGlassBlock)
     Registry.register(Registries.ITEM, HardenedGlassIdentifier, HardenedGlassItem)
 
-    ItemGroupEvents.modifyEntriesEvent(ItemGroups.COLORED_BLOCKS).register({content ->
-      content.add(HardenedGlassItem)
-    })
+    ItemGroupEvents.modifyEntriesEvent(ItemGroups.COLORED_BLOCKS).register { content ->
+        content.add(HardenedGlassItem)
+    }
   }
 }
