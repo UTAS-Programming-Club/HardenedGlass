@@ -8,3 +8,7 @@ pluginManagement {
 		gradlePluginPortal()
 	}
 }
+
+// TODO: Find a way to move this to gradle.properties/build.gradle without errors
+// Must match MOD_ID in HardenedGlass.kt
+rootProject.name = 'hardenedglass'
