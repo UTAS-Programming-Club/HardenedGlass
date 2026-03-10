@@ -1,3 +1,18 @@
 {
-  "block.hardenedglass.banner.pclogo.blue": "PC Logo"
+  "block.hardenedglass.banner.pclogo.white": "PC Logo",
+  "block.hardenedglass.banner.pclogo.light_gray": "PC Logo",
+  "block.hardenedglass.banner.pclogo.gray": "PC Logo",
+  "block.hardenedglass.banner.pclogo.black": "PC Logo",
+  "block.hardenedglass.banner.pclogo.brown": "PC Logo",
+  "block.hardenedglass.banner.pclogo.red": "PC Logo",
+  "block.hardenedglass.banner.pclogo.orange": "PC Logo",
+  "block.hardenedglass.banner.pclogo.yellow": "PC Logo",
+  "block.hardenedglass.banner.pclogo.lime": "PC Logo",
+  "block.hardenedglass.banner.pclogo.green": "PC Logo",
+  "block.hardenedglass.banner.pclogo.cyan": "PC Logo",
+  "block.hardenedglass.banner.pclogo.light_blue": "PC Logo",
+  "block.hardenedglass.banner.pclogo.blue": "PC Logo",
+  "block.hardenedglass.banner.pclogo.purple": "PC Logo",
+  "block.hardenedglass.banner.pclogo.magenta": "PC Logo",
+  "block.hardenedglass.banner.pclogo.pink": "PC Logo"
 }
