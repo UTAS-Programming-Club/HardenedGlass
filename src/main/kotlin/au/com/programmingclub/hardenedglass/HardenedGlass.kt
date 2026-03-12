@@ -11,5 +11,6 @@ object HardenedGlass : ModInitializer {
     // Proceed with mild caution.
     registerBaconItem()
     registerHardenedGlassBlock()
+    registerPigEntity()
   }
 }

@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:entity",
+  "pools": [
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "hardenedglass:bacon",
+          "weight": 99
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:acacia_boat",
+          "weight": 1
+        }
+      ]
+    }
+  ]
+}
