@@ -48,9 +48,9 @@ class BaseLongPigEntity(entityType: EntityType<out PigEntity?>, world: World) : 
   companion object {
     fun createMobAttribute(): DefaultAttributeContainer.Builder {
       return MobEntity.createMobAttributes()
-        .add(EntityAttributes.GENERIC_MAX_HEALTH, 25.0)
-        .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 2.0)
-        .add(EntityAttributes.GENERIC_JUMP_STRENGTH, 1.2)
+        .add(EntityAttributes.GENERIC_MAX_HEALTH, 15.0)
+        .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, .3)
+        .add(EntityAttributes.GENERIC_JUMP_STRENGTH, .7)
         .add(EntityAttributes.GENERIC_SCALE, 1.0)
     }
   }
