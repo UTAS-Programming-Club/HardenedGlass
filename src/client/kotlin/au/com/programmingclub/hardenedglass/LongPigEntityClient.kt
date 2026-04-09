@@ -4,10 +4,13 @@ import net.minecraft.client.model.*
 import net.minecraft.client.render.VertexConsumer
 import net.minecraft.client.render.entity.EntityRendererFactory
 import net.minecraft.client.render.entity.MobEntityRenderer
+import net.minecraft.client.render.entity.PigEntityRenderer
 import net.minecraft.client.render.entity.model.EntityModel
 import net.minecraft.client.util.math.MatrixStack
+import net.minecraft.entity.passive.PigEntity
 import net.minecraft.util.Identifier
 
+// CONVERTED FROM BLOCK BENCH MODEL EXPORT USING JAVAINUSE
 class LongPigEntityModel(val modelPart : ModelPart) : EntityModel<BaseLongPigEntity>() {
 
   companion object {
@@ -93,10 +96,10 @@ class LongPigEntityModel(val modelPart : ModelPart) : EntityModel<BaseLongPigEnt
 
 class LongPigEntityRenderer(context: EntityRendererFactory.Context) : MobEntityRenderer<BaseLongPigEntity, LongPigEntityModel>(
   context,
-  LongPigEntityModel(context.getPart(HardenedGlassClient.MODEL_CUBE_LAYER)),
+  LongPigEntityModel(context.getPart(HardenedGlassClient.MODEL_LONG_PIG_LAYER)),
   0.5f
 ) {
   override fun getTexture(entity: BaseLongPigEntity?): Identifier? {
-    return Identifier.of(namespace, "textures/entity/test/pig.png")
+    return Identifier.of(namespace, "textures/entity/long_pig/long_pig.png")
   }
 }
