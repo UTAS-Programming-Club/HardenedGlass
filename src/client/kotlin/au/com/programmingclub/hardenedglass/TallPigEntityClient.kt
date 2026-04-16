@@ -23,39 +23,39 @@ class TallPigEntityModel(val modelPart : ModelPart) : EntityModel<BaseTallPigEnt
             val body: ModelPartData? = modelPartData.addChild(
                 "body",
                 ModelPartBuilder.create().uv(28, 8)
-                    .cuboid(-5.0f, -10.0f, -7.0f, 10.0f, 32.0f, 8.0f, Dilation(0.0f)),
-                ModelTransform.of(0.0f, 11.0f, -7.0f, 1.5708f, 0.0f, 0.0f)
+                    .cuboid(-5.0f, -10.0f, 2f, 10.0f, 16.0f, 8.0f, Dilation(0.0f)),
+                ModelTransform.of(0.0f, 11.0f, 2f, 1.5708f, 0.0f, 0.0f)
             )
 
             val head: ModelPartData? = modelPartData.addChild(
                 "head",
-                ModelPartBuilder.create().uv(0, 0).cuboid(-4.0f, -4.0f, -8.0f, 8.0f, 8.0f, 8.0f, Dilation(0.0f))
-                    .uv(16, 16).cuboid(-2.0f, 0.0f, -9.0f, 4.0f, 3.0f, 1.0f, Dilation(0.0f)),
-                ModelTransform.pivot(0.0f, 12.0f, -15.0f)
+                ModelPartBuilder.create().uv(0, 0).cuboid(-4.0f, -13f, -8.0f, 8.0f, 8.0f, 8.0f, Dilation(0.0f))
+                    .uv(16, 16).cuboid(-2.0f, -9f, -9.0f, 4.0f, 3.0f, 1.0f, Dilation(0.0f)),
+                ModelTransform.pivot(0.0f, 12.0f, -6.0f)
             )
 
             val leg1: ModelPartData? = modelPartData.addChild(
                 "leg1",
-                ModelPartBuilder.create().uv(0, 16).cuboid(-2.0f, 0.0f, 5.0f, 4.0f, 6.0f, 4.0f, Dilation(0.0f)),
+                ModelPartBuilder.create().uv(0, 16).cuboid(-2.0f, -9.0f, -2.0f, 4.0f, 15.0f, 4.0f, Dilation(0.0f)),
                 ModelTransform.pivot(-3.0f, 18.0f, 7.0f)
             )
 
             val leg2: ModelPartData? = modelPartData.addChild(
                 "leg2",
-                ModelPartBuilder.create().uv(0, 16).cuboid(-2.0f, 0.0f, 5.0f, 4.0f, 6.0f, 4.0f, Dilation(0.0f)),
+                ModelPartBuilder.create().uv(0, 16).cuboid(-2.0f, -9.0f, -2.0f, 4.0f, 15.0f, 4.0f, Dilation(0.0f)),
                 ModelTransform.pivot(3.0f, 18.0f, 7.0f)
             )
 
             val leg3: ModelPartData? = modelPartData.addChild(
                 "leg3",
-                ModelPartBuilder.create().uv(0, 16).cuboid(-2.0f, 0.0f, -2.0f, 4.0f, 6.0f, 4.0f, Dilation(0.0f)),
-                ModelTransform.pivot(-3.0f, 18.0f, -14.0f)
+                ModelPartBuilder.create().uv(0, 16).cuboid(-2.0f, -9.0f, -2.0f, 4.0f, 15.0f, 4.0f, Dilation(0.0f)),
+                ModelTransform.pivot(-3.0f, 18.0f, -5.0f)
             )
 
             val leg4: ModelPartData? = modelPartData.addChild(
                 "leg4",
-                ModelPartBuilder.create().uv(0, 16).cuboid(-2.0f, 0.0f, -2.0f, 4.0f, 6.0f, 4.0f, Dilation(0.0f)),
-                ModelTransform.pivot(3.0f, 18.0f, -14.0f)
+                ModelPartBuilder.create().uv(0, 16).cuboid(-2.0f, -9.0f, -2.0f, 4.0f, 15.0f, 4.0f, Dilation(0.0f)),
+                ModelTransform.pivot(3.0f, 18.0f, -5f)
             )
             return TexturedModelData.of(modelData, 64, 64)
         }
