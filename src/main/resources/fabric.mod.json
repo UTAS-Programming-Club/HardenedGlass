@@ -1,7 +1,7 @@
 {
 	"schemaVersion": 1,
 	"id": "hardenedglass",
-	"version": "${version}",
+	"version": "${mod_version}+${minecraft_version}",
 	"name": "Hardened Glass",
 	"description": "",
 	"authors": [
