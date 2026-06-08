@@ -1,6 +1,6 @@
 plugins {
-	id 'fabric-loom' version '1.10.5' apply false
-	id 'ploceus' version '1.10.20' apply false
+	id 'fabric-loom' version '1.17-SNAPSHOT' apply false
+	id 'ploceus' version '1.17-SNAPSHOT' apply false
 	id 'maven-publish'
 	id 'java'
 	id 'org.jetbrains.kotlin.jvm' version '2.0.0'
@@ -55,12 +55,12 @@ def configure(project) {
 
 	project.dependencies {
 		minecraft "com.mojang:minecraft:${project.minecraft_version}"
-		mappings project.ploceus.featherMappings(project.feather_build)
 		modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
 		exceptions project.ploceus.raven(project.raven_build)
 		signatures project.ploceus.sparrow(project.sparrow_build)
 		nests project.ploceus.nests(project.nests_build)
+		mappings project.ploceus.featherMappings(project.feather_build)
 
 		project.ploceus.dependOsl(project.osl_version, project.environment)
 		modImplementation "net.fabricmc:fabric-language-kotlin:${project.fabric_kotlin_version}"

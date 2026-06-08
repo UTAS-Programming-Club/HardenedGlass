@@ -3,8 +3,9 @@
 	"id": "hardenedglass",
 	"version": "${mod_version}+${minecraft_version}",
 	"name": "Hardened Glass",
-	"description": "",
+	"description": "A mod to add hardened, blast resistant glass for our server.",
 	"authors": [
+		"Programming Club",
 		"Joshua Wierenga"
 	],
 	"contact": {
@@ -26,11 +27,11 @@
 		"hardenedglass.mixins.json"
 	],
 	"depends": {
-		"fabricloader": ">=0.15.10",
+		"fabricloader": ">=${loader_version}",
 		"minecraft": "1.0.0-beta.7.3",
 		"java": ">=8",
 		"osl-entrypoints": ">=0.4.0",
-		"fabric-language-kotlin": "*"
+		"fabric-language-kotlin": ">=${fabric_kotlin_version}"
 	},
 	"suggests": {
 		"another-mod": "*"
