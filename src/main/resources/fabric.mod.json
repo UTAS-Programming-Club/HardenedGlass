@@ -31,7 +31,7 @@
 		"minecraft": "1.0.0-beta.7.3",
 		"java": ">=8",
 		"osl-entrypoints": ">=0.4.0",
-		"fabric-language-kotlin": ">=${fabric_kotlin_version}"
+		"fabric-language-kotlin": ">=${fabric_kotlin_version}+kotlin.${kotlin_version}"
 	},
 	"suggests": {
 		"another-mod": "*"

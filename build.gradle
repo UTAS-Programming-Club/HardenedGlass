@@ -3,7 +3,7 @@ plugins {
 	id 'ploceus' version '1.17-SNAPSHOT' apply false
 	id 'maven-publish'
 	id 'java'
-	id 'org.jetbrains.kotlin.jvm' version '2.0.0'
+	id 'org.jetbrains.kotlin.jvm' version "${kotlin_version}"
 }
 
 repositories {
@@ -17,11 +17,11 @@ def configure(project) {
 	project.apply plugin: 'java'
 	project.apply plugin: 'org.jetbrains.kotlin.jvm'
 
-	project.version = "${project.rootProject.version}+mc${project.rootProject.minecraft_version}"
-	project.maven_group = project.rootProject.maven_group
+	project.version = "${mod_version}+mc${minecraft_version}"
+	project.maven_group = maven_group
 
 	project.base {
-		archivesName = "${project.rootProject.archives_base_name}-${project.environment}"
+		archivesName = "${archives_base_name}-${project.environment}"
 	}
 
 	project.repositories {
@@ -43,8 +43,6 @@ def configure(project) {
 	}
 
 	project.ploceus {
-		// setIntermediaryGeneration(1)
-
 		if (project.environment == 'client') {
 			clientOnlyMappings()
 		}
@@ -54,16 +52,16 @@ def configure(project) {
 	}
 
 	project.dependencies {
-		minecraft "com.mojang:minecraft:${project.minecraft_version}"
-		modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+		minecraft "com.mojang:minecraft:${minecraft_version}"
+		modImplementation "net.fabricmc:fabric-loader:${loader_version}"
 
 		exceptions project.ploceus.raven(project.raven_build)
 		signatures project.ploceus.sparrow(project.sparrow_build)
 		nests project.ploceus.nests(project.nests_build)
 		mappings project.ploceus.featherMappings(project.feather_build)
 
-		project.ploceus.dependOsl(project.osl_version, project.environment)
-		modImplementation "net.fabricmc:fabric-language-kotlin:${project.fabric_kotlin_version}"
+		project.ploceus.dependOsl(osl_version, project.environment)
+		modImplementation "net.fabricmc:fabric-language-kotlin:${fabric_kotlin_version}+kotlin.${kotlin_version}"
 	}
 
 	project.sourceSets {
