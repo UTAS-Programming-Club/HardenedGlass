@@ -1,0 +1,11 @@
+accessWidener v1 official
+
+accessible method net/minecraft/crafting/CraftingManager registerShaped (Lnet/minecraft/item/ItemStack;[Ljava/lang/Object;)V
+accessible method net/minecraft/crafting/CraftingManager registerShapeless (Lnet/minecraft/item/ItemStack;[Ljava/lang/Object;)V
+
+accessible field net/minecraft/client/Minecraft INSTANCE Lnet/minecraft/client/Minecraft;
+accessible field net/minecraft/client/render/texture/TextureManager texturePacks Lnet/minecraft/client/resource/pack/TexturePacks;
+accessible field net/minecraft/client/render/entity/PlayerRenderer ARMOR_VARIANTS [Ljava/lang/String;
+mutable  field net/minecraft/client/render/entity/PlayerRenderer ARMOR_VARIANTS [Ljava/lang/String;
+accessible field net/minecraft/entity/Entities KEY_TO_TYPE Ljava/util/Map;
+accessible field net/minecraft/locale/Language translations Ljava/util/Properties;

@@ -1,43 +1,37 @@
 # Joshua has notepad++ backups enabled and has no need to commit them
 nppBackup/
 
-# gradle
-
+# Gradle
 .gradle/
 build/
 out/
 classes/
 
-# eclipse
+# Quilt Loom
+remappedSrc/
+run/
 
+# Eclipse
 *.launch
 
-# idea
-
+# IntelliJ Idea
 .idea/
 *.iml
 *.ipr
 *.iws
 
-# vscode
+# Fleet
+.fleet/
 
+# Visual Studio Code
 .settings/
 .vscode/
 bin/
 .classpath
 .project
 
-# macos
+# Eclipse JDT LS
+workspace/
 
+# macOS
 *.DS_Store
-
-# fabric
-
-run/
-
-# java
-
-hs_err_*.log
-replay_*.log
-*.hprof
-*.jfr

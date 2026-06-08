@@ -13,33 +13,23 @@
 	},
 	"license": "",
 	"icon": "assets/hardenedglass/icon.png",
-	"environment": "*",
+	"environment": "${environment}",
 	"entrypoints": {
-		"main": [
+		"init": [
 			{
 				"value": "au.com.programmingclub.hardenedglass.HardenedGlass",
-				"adapter": "kotlin"
-			}
-		],
-		"client": [
-			{
-				"value": "au.com.programmingclub.hardenedglass.HardenedGlassClient",
 				"adapter": "kotlin"
 			}
 		]
 	},
 	"mixins": [
-		"hardenedglass.mixins.json",
-		{
-			"config": "hardenedglass.client.mixins.json",
-			"environment": "client"
-		}
+		"hardenedglass.mixins.json"
 	],
 	"depends": {
 		"fabricloader": ">=0.15.10",
-		"minecraft": "~1.20.6",
-		"java": ">=21",
-		"fabric-api": "*",
+		"minecraft": "1.0.0-beta.7.3",
+		"java": ">=8",
+		"osl-entrypoints": ">=0.4.0",
 		"fabric-language-kotlin": "*"
 	},
 	"suggests": {

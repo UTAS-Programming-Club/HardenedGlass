@@ -1,0 +1,1271 @@
+package au.com.programmingclub.hardenedglass
+
+import net.minecraft.block.Block
+import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.screen.Screen
+import net.minecraft.client.render.entity.PlayerRenderer
+import net.minecraft.client.render.texture.TextureManager
+import net.minecraft.client.resource.pack.TexturePacks
+import net.minecraft.crafting.CraftingManager
+import net.minecraft.crafting.SmeltingManager
+import net.minecraft.entity.Entities
+import net.minecraft.entity.Entity
+import net.minecraft.entity.mob.MobCategory
+import net.minecraft.entity.mob.MobEntity
+import net.minecraft.entity.mob.player.PlayerEntity
+import net.minecraft.item.BlockItem
+import net.minecraft.item.Item
+import net.minecraft.item.ItemStack
+import net.minecraft.locale.Language
+import net.minecraft.stat.ItemStat
+import net.minecraft.stat.Stats
+import net.minecraft.util.crash.CrashReport
+import net.minecraft.world.biome.Biome
+import net.minecraft.world.biome.HellBiome
+import org.apache.logging.log4j.LogManager
+import org.apache.logging.log4j.Logger
+import java.awt.image.BufferedImage
+import java.io.File
+import java.io.IOException
+import java.io.InputStream
+import java.io.OutputStream
+import java.lang.reflect.InvocationTargetException
+import java.nio.file.Files
+import java.util.Properties
+import java.util.logging.FileHandler
+import java.util.logging.Level
+import java.util.logging.SimpleFormatter
+import javax.imageio.ImageIO
+import kotlin.collections.ifEmpty
+import kotlin.collections.toTypedArray
+import kotlin.reflect.full.staticProperties
+import kotlin.reflect.jvm.isAccessible
+
+// Partial port of rgml-quilt's version of ModLoader to beta 1.7.3
+// https://github.com/sschr15/rgml-quilt/blob/f0e4c913fc7cac8b3c3fbcc2d6b64c70a0837c12/src/main/risugami/org/duvetmc/rgml/ModLoader.java
+// Used under MIT License
+
+@Suppress("unused", "FunctionName", "GrazieInspection", "SpellCheckingInspection")
+object ModLoader {
+    /*private val animList: MutableList<TextureAtlas> = LinkedList<TextureAtlas>()
+    private val blockModels: MutableMap<Int?, BaseMod?> = HashMap<Int?, BaseMod?>()*/
+    private val blockSpecialInv: MutableMap<Int?, Boolean?> = HashMap()
+    private val cfgdir: File = File(Minecraft.getWorkingDirectory(), "/config/")
+    private val cfgfile: File = File(cfgdir, "ModLoader.cfg")
+    var cfgLoggingLevel: Level = Level.FINER
+    private lateinit var classMap: Map<String, Class<out Entity>>
+    /*private var clock = 0L
+    const val DEBUG: Boolean = false*/
+    // private var field_animList: Field? = null
+    // private var field_armorList: Field? = null
+    // private var field_modifiers: Field? = null
+    // private var field_TileEntityRenderers: Field? = null
+    private var hasInit = false
+    private var highestEntityId = 3000
+    /*private val inGameHooks: MutableMap<BaseMod?, Boolean?> = HashMap<BaseMod?, Boolean?>()
+    private val inGUIHooks: MutableMap<BaseMod?, Boolean?> = HashMap<BaseMod?, Boolean?>()*/
+    private var instance: Minecraft? = null
+    private var itemSpriteIndex = 0
+    private var itemSpritesLeft = 0
+    /*private val keyList: MutableMap<BaseMod?, MutableMap<KeyBinding?, BooleanArray?>> =
+        HashMap<BaseMod?, MutableMap<KeyBinding?, BooleanArray?>>()*/
+    private val logfile: File = File(Minecraft.getWorkingDirectory(), "ModLoader.txt")
+    private val logger: Logger = LogManager.getLogger("ModLoader")
+    private var logHandler: FileHandler? = null
+    /*private var method_RegisterEntityID: Method? = null
+    private var method_RegisterTileEntity: Method? = null*/
+    private val modDir: File = File(Minecraft.getWorkingDirectory(), "/mods/")
+    /*private val modList: LinkedList<BaseMod> = LinkedList<BaseMod>()
+    private var nextBlockModelID = 1000*/
+    private val overrides: MutableMap<Int, MutableMap<String, Int>> = HashMap()
+    val props: Properties = Properties()
+    private lateinit var standardBiomes: Array<Biome>
+    private var terrainSpriteIndex = 0
+    private var terrainSpritesLeft = 0
+    /*private var texPack: String? = null
+    private var texturesAdded = false*/
+    private val usedItemSprites = BooleanArray(256)
+    private val usedTerrainSprites = BooleanArray(256)
+    /*const val VERSION: String = "ModLoader Beta 1.8.1"
+
+    private val G_BlockRenderer_cfgGrassFix: MethodHandle
+    private val S_BlockRenderer_cfgGrassFix: MethodHandle*/
+
+    /*init {
+        try {
+            G_BlockRenderer_cfgGrassFix = MethodHandles.lookup()
+                .findStaticGetter(BlockRenderer::class.java, "cfgGrassFix", Boolean::class.javaPrimitiveType)
+            S_BlockRenderer_cfgGrassFix = MethodHandles.lookup()
+                .findStaticSetter(BlockRenderer::class.java, "cfgGrassFix", Boolean::class.javaPrimitiveType)
+        } catch (e: NoSuchFieldException) {
+            throw RuntimeException(e)
+        } catch (e: IllegalAccessException) {
+            throw RuntimeException(e)
+        }
+    }
+
+    fun AddAchievementDesc(achievement: AchievementStat, name: String?, description: String?) {
+        try {
+            if (achievement.name.contains(".")) {
+                val split: Array<String?> = achievement.name.split("\\.")
+                if (split.size == 2) {
+                    val key = split[1]
+                    AddLocalization("achievement." + key, name)
+                    AddLocalization("achievement." + key + ".desc", description)
+                    setPrivateValue(Stat::class.java, achievement, 1, I18n.translate("achievement." + key))
+                    setPrivateValue(
+                        AchievementStat::class.java,
+                        achievement,
+                        3,
+                        I18n.translate("achievement." + key + ".desc")
+                    )
+                } else {
+                    ModLoader.setPrivateValue<AchievementStat?, String?>(Stat::class.java, achievement, 1, name)
+                    ModLoader.setPrivateValue<AchievementStat?, String?>(
+                        AchievementStat::class.java,
+                        achievement,
+                        3,
+                        description
+                    )
+                }
+            } else {
+                ModLoader.setPrivateValue<AchievementStat?, String?>(Stat::class.java, achievement, 1, name)
+                ModLoader.setPrivateValue<AchievementStat?, String?>(
+                    AchievementStat::class.java,
+                    achievement,
+                    3,
+                    description
+                )
+            }
+        } catch (var5: IllegalArgumentException) {
+            logger.throwing<Exception?>(var5)
+            ThrowException(var5)
+        } catch (var5: NoSuchFieldException) {
+            logger.throwing<Exception?>(var5)
+            ThrowException(var5)
+        } catch (var5: SecurityException) {
+            logger.throwing<Exception?>(var5)
+            ThrowException(var5)
+        }
+    }
+
+    fun AddAllFuel(id: Int, metadata: Int): Int {
+        logger.trace("Finding fuel for " + id)
+        var result = 0
+        val iter: MutableIterator<BaseMod> = modList.iterator()
+
+        while (iter.hasNext() && result == 0) {
+            result = iter.next().AddFuel(id, metadata)
+        }
+
+        if (result != 0) {
+            logger.trace("Returned " + result)
+        }
+
+        return result
+    }
+
+    fun AddAllRenderers(renderers: MutableMap<Class<out Entity?>?, EntityRenderer<*>?>?) {
+        if (!hasInit) {
+            init()
+            logger.trace("Initialized")
+        }
+
+        for (mod in modList) {
+            mod.AddRenderer(renderers)
+        }
+    }
+
+    fun addAnimation(anim: TextureAtlas) {
+        logger.trace("Adding animation " + anim.toString())
+
+        for (oldAnim in animList) {
+            if (oldAnim.sprite === anim.sprite && oldAnim.type === anim.type) {
+                animList.remove(anim)
+                break
+            }
+        }
+
+        animList.add(anim)
+    }*/
+
+    fun AddArmor(armor: String): Int {
+        val index = PlayerRenderer.ARMOR_VARIANTS.indexOf(armor)
+        if (index != -1) {
+            return index
+        }
+
+        val combinedList: MutableList<String> = PlayerRenderer.ARMOR_VARIANTS.toMutableList()
+        combinedList.add(armor)
+
+        PlayerRenderer.ARMOR_VARIANTS = combinedList.toTypedArray()
+        return combinedList.indexOf(armor)
+    }
+
+    fun AddLocalization(key: String, value: String) {
+        Language.getInstance().translations[key] = value
+    }
+
+    /*private fun addMod(loader: ClassLoader, filename: String) {
+        try {
+            val name = filename.split("\\.".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()[0]
+            if (name.contains("$")) {
+                return
+            }
+
+            if (props.containsKey(name) && (props.getProperty(name)
+                    .equals("no", ignoreCase = true) || props.getProperty(name).equals("off", ignoreCase = true))
+            ) {
+                return
+            }
+
+            val instclass = loader.loadClass(name)
+            if (!BaseMod::class.java.isAssignableFrom(instclass)) {
+                return
+            }
+
+            setupProperties(instclass as Class<out BaseMod?>)
+            val mod: BaseMod = instclass.newInstance() as BaseMod
+            modList.add(mod)
+            logger.trace("Mod Loaded: \"" + mod + "\" from " + filename)
+            println("Mod Loaded: " + mod)
+        } catch (var6: Throwable) {
+            logger.trace("Failed to load mod from \"" + filename + "\"")
+            println("Failed to load mod from \"" + filename + "\"")
+            logger.error("Error in addMod", var6)
+            ThrowException(var6)
+        }
+    }*/
+
+    fun AddName(instance: Any, name: String) {
+        var tag: String? = null
+        if (instance is Item) {
+            val item = instance
+            if (item.translationKey != null) {
+                tag = item.translationKey + ".name"
+            }
+        } else if (instance is Block) {
+            val block = instance
+            if (block.translationKey != null) {
+                tag = block.translationKey + ".name"
+            }
+        } else if (instance is ItemStack) {
+            val stack = instance
+            if (stack.translationKey != null) {
+                tag = stack.translationKey + ".name"
+            }
+        } else {
+            val e = Exception(instance.javaClass.getName() + " cannot have name attached to it!")
+            logger.error("Error in AddName", e)
+            ThrowException(e)
+        }
+
+        if (tag != null) {
+            AddLocalization(tag, name)
+        } else {
+            val e = Exception("$instance is missing name tag!")
+            logger.error("Error in AddName", e)
+            ThrowException(e)
+        }
+    }
+
+    fun addOverride(fileToOverride: String, fileToAdd: String): Int {
+        try {
+            val i = getUniqueSpriteIndex(fileToOverride)
+            addOverride(fileToOverride, fileToAdd, i)
+            return i
+        } catch (var3: Throwable) {
+            logger.error("Error in addOverride", var3)
+            ThrowException(var3)
+            throw RuntimeException(var3)
+        }
+    }
+
+    fun addOverride(path: String, overlayPath: String, index: Int) {
+        var left: Int
+        val var6: Byte
+        when (path) {
+            "/terrain.png" -> {
+                var6 = 0
+                left = terrainSpritesLeft
+            }
+            "/gui/items.png" -> {
+                var6 = 1
+                left = itemSpritesLeft
+            }
+            else -> return
+        }
+
+        println("Overriding $path with $overlayPath @ $index. $left left.")
+        logger.trace("addOverride($path,$overlayPath,$index). $left left.")
+        val overlays = overrides.computeIfAbsent(var6.toInt()) { _: Int -> HashMap() }
+
+        overlays[overlayPath] = index
+    }
+
+    fun AddRecipe(output: ItemStack, vararg params: Any) {
+        CraftingManager.getInstance().registerShaped(output, *params)
+    }
+
+    fun AddShapelessRecipe(output: ItemStack, vararg params: Any?) {
+        CraftingManager.getInstance().registerShapeless(output, *params)
+    }
+
+    fun AddSmelting(input: Block, output: ItemStack) {
+        SmeltingManager.getInstance().register(input.id, output)
+    }
+
+    fun AddSmelting(input: Item, output: ItemStack) {
+        SmeltingManager.getInstance().register(input.id, output)
+    }
+
+    fun AddSpawn(
+        entityClass: Class<out MobEntity>,
+        weightedProb: Int,
+        // min: Int,
+        // max: Int,
+        spawnList: MobCategory,
+        vararg biomes: Biome
+    ) {
+        val fullBiomes: Array<out Biome> = biomes.ifEmpty { standardBiomes }
+
+        for (biome in fullBiomes) {
+            val list = biome.getSpawnEntries(spawnList)
+            if (list != null) {
+                var exists = false
+
+                for (entry in list) {
+                    if (entry.type == entityClass) {
+                        entry.weight = weightedProb
+                        // entry.minGroupSize = min
+                        // entry.maxGroupSize = max
+                        exists = true
+                        break
+                    }
+                }
+
+                if (!exists) {
+                    list.add(Biome.SpawnEntry(entityClass, weightedProb/*, min, max*/))
+                }
+            }
+        }
+    }
+
+    fun AddSpawn(
+        entityName: String,
+        weightedProb: Int,
+        // min: Int,
+        // max: Int,
+        spawnList: MobCategory,
+        vararg biomes: Biome
+    ) {
+        val entityClass: Class<out Entity> = classMap[entityName]!!
+        if (MobEntity::class.java.isAssignableFrom(entityClass)) {
+            @Suppress("UNCHECKED_CAST")
+            AddSpawn(entityClass as Class<out MobEntity>, weightedProb/*, min, max*/, spawnList, *biomes)
+        }
+    }
+
+    /*fun DispenseEntity(
+        world: World?,
+        x: Double,
+        y: Double,
+        z: Double,
+        xVel: Int,
+        zVel: Int,
+        item: ItemStack?
+    ): Boolean {
+        var result = false
+        val iter: MutableIterator<BaseMod> = modList.iterator()
+
+        while (iter.hasNext() && !result) {
+            result = iter.next().DispenseEntity(world, x, y, z, xVel, zVel, item)
+        }
+
+        return result
+    }
+
+    val loadedMods: MutableList<BaseMod>
+        get() = Collections.unmodifiableList<BaseMod?>(modList)
+
+    fun getLogger(): Logger {
+        return object : Logger("ModLoader", null) {
+            fun fromJava(level: Level?): Level {
+                if (level === Level.ALL) return Level.ALL
+                if (level === Level.CONFIG) return Level.INFO
+                if (level === Level.FINE || level === Level.FINER || level === Level.FINEST) return Level.DEBUG
+                if (level === Level.INFO) return Level.INFO
+                if (level === Level.SEVERE) return Level.ERROR
+                if (level === Level.WARNING) return Level.WARN
+                return Level.OFF
+            }
+
+            public override fun log(level: Level?, msg: String?) {
+                logger.log(fromJava(level), msg)
+            }
+        }
+    }*/
+
+    val minecraftInstance: Minecraft
+        get() {
+            if (instance == null) {
+                instance = Minecraft.INSTANCE
+            }
+
+            return instance!!
+        }
+
+    /*fun getUniqueBlockModelID(mod: BaseMod?, full3DItem: Boolean): Int {
+        val id = nextBlockModelID++
+        blockModels.put(id, mod)
+        blockSpecialInv.put(id, full3DItem)
+        return id
+    }*/
+
+    val uniqueEntityId: Int
+        get() = highestEntityId++
+
+    private val uniqueItemSpriteIndex: Int
+        get() {
+            while (itemSpriteIndex < usedItemSprites.size) {
+                if (!usedItemSprites[itemSpriteIndex]) {
+                    usedItemSprites[itemSpriteIndex] = true
+                    --itemSpritesLeft
+                    return itemSpriteIndex++
+                }
+
+                ++itemSpriteIndex
+            }
+
+            val e = Exception("No more empty item sprite indices left!")
+            logger.error("Error in getUniqueItemSpriteIndex", e)
+            ThrowException(e)
+            return 0
+        }
+
+    fun getUniqueSpriteIndex(path: String): Int {
+        when (path) {
+            "/gui/items.png" -> {
+                return uniqueItemSpriteIndex
+            }
+            "/terrain.png" -> {
+                return uniqueTerrainSpriteIndex
+            }
+            else -> {
+                val e = Exception("No registry for this texture: $path")
+                logger.error("Error in getUniqueItemSpriteIndex", e)
+                ThrowException(e)
+                return 0
+            }
+        }
+    }
+
+    private val uniqueTerrainSpriteIndex: Int
+        get() {
+            while (terrainSpriteIndex < usedTerrainSprites.size) {
+                if (!usedTerrainSprites[terrainSpriteIndex]) {
+                    usedTerrainSprites[terrainSpriteIndex] = true
+                    --terrainSpritesLeft
+                    return terrainSpriteIndex++
+                }
+
+                ++terrainSpriteIndex
+            }
+
+            val e = Exception("No more empty terrain sprite indices left!")
+            logger.error("Error in getUniqueItemSpriteIndex", e)
+            ThrowException(e)
+            return 0
+        }
+
+    fun init() {
+        hasInit = true
+        val usedItemSpritesString =
+            "1111111111111111111111111111111111111101111111011111111111111111111111111111111111111111111111111111110111110111111111000110001111111101100000110000000100000011000000010000001100000000000000110000000000000000000000000000000000000000000000001100000000000000"
+        val usedTerrainSpritesString =
+            "1111111111111111111111111111110111111111111111111111111111111111111111111111000111111111111111111111111111111111111111111111111111111111110011111111111110000000111111000000000011111100000000001111000000000111111000000000001101000000000001111111111111111111"
+
+        for (i in 0..255) {
+            usedItemSprites[i] = usedItemSpritesString[i] == '1'
+            if (!usedItemSprites[i]) {
+                ++itemSpritesLeft
+            }
+
+            usedTerrainSprites[i] = usedTerrainSpritesString[i] == '1'
+            if (!usedTerrainSprites[i]) {
+                ++terrainSpritesLeft
+            }
+        }
+
+        try {
+            // instance = getPrivateValue(Minecraft::class, null, 1)
+            // instance = Minecraft::class.getPrivateField(1)
+            // checkNotNull(instance)
+            // instance!!.gameRenderer = EntityRendererProxy(instance)
+            classMap = Entities.KEY_TO_TYPE
+            // field_modifiers = Field::class.java.getDeclaredField("modifiers")
+            // field_modifiers!!.setAccessible(true)
+            // field_TileEntityRenderers = BlockEntityRenderDispatcher::class.java.getDeclaredFields()[0]
+            // field_TileEntityRenderers!!.setAccessible(true)
+            // field_armorList = PlayerRenderer::class.java.getDeclaredFields()[3]
+            // field_modifiers!!.setInt(field_armorList, field_armorList!!.modifiers and -17)
+            // field_armorList!!.setAccessible(true)
+            // field_animList = TextureManager::class.java.getDeclaredFields()[6]
+            // field_animList!!.setAccessible(true)
+
+            standardBiomes = Biome::class.staticProperties.mapNotNull {
+                it.isAccessible = true
+                val biome: Any? = it.get()
+                if (biome is Biome && (biome !is HellBiome/* && biome !is TheEndBiome*/)) {
+                    biome
+                } else {
+                    null
+                }
+            }.toTypedArray()
+
+            /*method_RegisterTileEntity = RuntimeRemapUtil.getRuntimeDeclaredMethod(
+                BlockEntity::class.java, "a", arrayOf<Class<*>>(
+                    Class::class.java, String::class.java
+                )
+            )
+            method_RegisterTileEntity.setAccessible(true)
+            method_RegisterEntityID = RuntimeRemapUtil.getRuntimeDeclaredMethod(
+                Entities::class.java, "a", arrayOf<Class<*>>(
+                    Class::class.java, String::class.java, Int::class.javaPrimitiveType
+                )
+            )
+            method_RegisterEntityID.setAccessible(true)*/
+        } catch (var10: SecurityException) {
+            logger.error("Error in init", var10)
+            ThrowException(var10)
+            throw RuntimeException(var10)
+        } catch (var10: IllegalAccessException) {
+            logger.error("Error in init", var10)
+            ThrowException(var10)
+            throw RuntimeException(var10)
+        } catch (var10: IllegalArgumentException) {
+            logger.error("Error in init", var10)
+            ThrowException(var10)
+            throw RuntimeException(var10)
+        } catch (var10: NoSuchMethodException) {
+            logger.error("Error in init", var10)
+            ThrowException(var10)
+            throw RuntimeException(var10)
+        } catch (var10: NoSuchFieldException) {
+            logger.error("Error in init", var10)
+            ThrowException(var10)
+            throw RuntimeException(var10)
+        }
+
+        try {
+            loadConfig()
+            /*if (props.containsKey("grassFix")) {
+                S_BlockRenderer_cfgGrassFix.invoke(props.getProperty("grassFix").toBoolean())
+            }*/
+
+            if ((logfile.exists() || logfile.createNewFile()) && logfile.canWrite() && logHandler == null) {
+                logHandler = FileHandler(logfile.path)
+                logHandler!!.setFormatter(SimpleFormatter())
+            }
+
+            logger.trace("ModLoader Beta 1.8.1 Initializing...")
+            println("ModLoader Beta 1.8.1 Initializing...")
+            //			File source = new File(ModLoader.class.getProtectionDomain().getCodeSource().getLocation().toURI());
+            modDir.mkdirs()
+            //			readFromModFolder(modDir);
+//			readFromClassPath(source);
+            // RgmlLoadSystem.locateMods(modList)
+            println("Done.")
+            props.setProperty("loggingLevel", cfgLoggingLevel.name)
+            // props.setProperty("grassFix", (G_BlockRenderer_cfgGrassFix.invoke() as Boolean).toString())
+
+            /*for (mod in modList) {
+                mod.ModsLoaded()
+                if (!props.containsKey(mod.getClass().getName())) {
+                    props.setProperty(mod.getClass().getName(), "on")
+                }
+            }*/
+
+            // instance!!.options.keyBindings = RegisterAllKeys(instance!!.options.keyBindings)
+            // instance!!.options.load()
+            initStats()
+            saveConfig()
+        } catch (var9: Throwable) {
+            logger.error("Error in init", var9)
+            ThrowException("ModLoader has failed to initialize.", var9)
+            if (logHandler != null) {
+                logHandler!!.close()
+            }
+
+            throw RuntimeException(var9)
+        }
+    }
+
+    private fun initStats() {
+        for (id in Block.BY_ID.indices) {
+            if (Stats.byKey(16777216 + id) != null && Block.BY_ID[id] != null && Block.BY_ID[id].hasStats()) {
+                val str: String? = Language.getInstance().translate("stat.mineBlock", Block.BY_ID[id].name)
+                val stat = ItemStat(16777216 + id, str, id)
+                // Stats.BLOCKS_MINED[id] = stat.register()
+                Stats.MINED.add(stat)
+            }
+        }
+
+        for (id in Item.BY_ID.indices) {
+            if (Stats.byKey(16908288 + id) != null && Item.BY_ID[id] != null) {
+                val str: String? = Language.getInstance().translate("stat.useItem", Item.BY_ID[id].displayName)
+                val stat = ItemStat(16908288 + id, str, id)
+                // Stats.ITEMS_USED[id] = stat.register()
+                if (id >= Block.BY_ID.size) {
+                    Stats.USED.add(stat)
+                }
+            }
+
+            /*if (Stats.byKey(16973824 + id) != null && Item.BY_ID[id] != null && Item.BY_ID[id].isDamageable) {
+                val str: String? = Language.getInstance().translate("stat.breakItem", Item.BY_ID[id].displayName)
+                Stats.ITEMS_BROKEN[id] = ItemStat(16973824 + id, str, id).register()
+            }*/
+        }
+
+        val idHashSet = HashSet<Int?>()
+
+        for (result in CraftingManager.getInstance().recipes) {
+            idHashSet.add(result.result.id)
+        }
+
+        for (result in SmeltingManager.getInstance().recipes.values) {
+            idHashSet.add(result.id)
+        }
+
+        /*for (id in idHashSet) {
+            if (Stats.byKey(16842752 + id!!) != null && Item.BY_ID[id] != null) {
+                val str: String? = Language.getInstance().translate("stat.craftItem", Item.BY_ID[id].displayName)
+                Stats.ITEMS_CRAFTED[id] = ItemStat(16842752 + id, str, id).register()
+            }
+        }*/
+    }
+
+    fun isGUIOpen(gui: Class<out Screen?>?): Boolean {
+        val game = minecraftInstance
+        @Suppress("IfThenToElvis")
+        return if (gui == null) {
+            game.screen == null
+        } else {
+            gui.isInstance(game.screen)
+        }
+    }
+
+    /*fun isModLoaded(modname: String?): Boolean {
+        var chk: Class<*>? = null
+
+        try {
+            chk = Class.forName(modname)
+        } catch (var4: ClassNotFoundException) {
+            return false
+        }
+
+        for (mod in modList) {
+            if (chk.isInstance(mod)) {
+                return true
+            }
+        }
+
+        return false
+    }*/
+
+    @Throws(IOException::class)
+    fun loadConfig() {
+        cfgdir.mkdir()
+        if (cfgfile.exists() || cfgfile.createNewFile()) {
+            if (cfgfile.canRead()) {
+                val `in`: InputStream = Files.newInputStream(cfgfile.toPath())
+                props.load(`in`)
+                `in`.close()
+            }
+        }
+    }
+
+    @Throws(Exception::class)
+    fun loadImage(texCache: TextureManager?, path: String?): BufferedImage {
+        val pack: TexturePacks =  checkNotNull(texCache?.texturePacks)
+        val input = pack.selected.getResource(path)
+        if (input == null) {
+            throw Exception("Image not found: $path")
+        } else {
+            val image = ImageIO.read(input)
+            if (image == null) {
+                throw Exception("Image corrupted: $path")
+            } else {
+                return image
+            }
+        }
+    }
+
+    /*fun OnItemPickup(player: PlayerEntity?, item: ItemStack?) {
+        for (mod in modList) {
+            mod.OnItemPickup(player, item)
+        }
+    }
+
+    fun OnTick(tick: Float, game: Minecraft) {
+        if (!hasInit) {
+            init()
+            logger.trace("Initialized")
+        }
+
+        if (texPack == null || game.options.skin !== texPack) {
+            texturesAdded = false
+            texPack = game.options.skin
+        }
+
+        if (!texturesAdded && game.textureManager != null) {
+            RegisterAllTextureOverrides(game.textureManager)
+            texturesAdded = true
+        }
+
+        var newclock = 0L
+        if (game.world != null) {
+            newclock = game.world.getTime()
+            val iter: MutableIterator<MutableMap.MutableEntry<BaseMod?, Boolean?>> = inGameHooks.entries.iterator()
+
+            while (iter.hasNext()) {
+                val modSet: MutableMap.MutableEntry<BaseMod?, Boolean?> = iter.next()
+                if ((clock != newclock || !modSet.value!!) && !modSet.key.OnTickInGame(tick, game)) {
+                    iter.remove()
+                }
+            }
+        }
+
+        if (game.screen != null) {
+            val iter: MutableIterator<MutableMap.MutableEntry<BaseMod?, Boolean?>> = inGUIHooks.entries.iterator()
+
+            while (iter.hasNext()) {
+                val modSet: MutableMap.MutableEntry<BaseMod?, Boolean?> = iter.next()
+                if ((clock != newclock || !(modSet.value!! and (game.world != null))) && !modSet.key.OnTickInGUI(
+                        tick,
+                        game,
+                        game.screen
+                    )
+                ) {
+                    iter.remove()
+                }
+            }
+        }
+
+        if (clock != newclock) {
+            for (modSet in keyList.entries) {
+                for (keySet in modSet.value.entries) {
+                    val state: Boolean = Keyboard.isKeyDown(keySet.key.keyCode)
+                    val keyInfo: BooleanArray = keySet.value!!
+                    val oldState = keyInfo[1]
+                    keyInfo[1] = state
+                    if (state && (!oldState || keyInfo[0])) {
+                        modSet.key.KeyboardEvent(keySet.key)
+                    }
+                }
+            }
+        }
+
+        clock = newclock
+    }*/
+
+    fun OpenGUI(player: PlayerEntity?, gui: Screen?) {
+        if (!hasInit) {
+            init()
+            logger.trace("Initialized")
+        }
+
+        val game = minecraftInstance
+        if (game.player === player) {
+            if (gui != null) {
+                game.openScreen(gui)
+            }
+        }
+    }
+
+    /*fun PopulateChunk(generator: ChunkSource, chunkX: Int, chunkZ: Int, world: World) {
+        if (!hasInit) {
+            init()
+            logger.trace("Initialized")
+        }
+
+        val rnd = Random(world.getSeed())
+        val xSeed = rnd.nextLong() / 2L * 2L + 1L
+        val zSeed = rnd.nextLong() / 2L * 2L + 1L
+        rnd.setSeed(chunkX.toLong() * xSeed + chunkZ.toLong() * zSeed xor world.getSeed())
+
+        for (mod in modList) {
+            if (generator.getDebugInfo().equals("RandomLevelSource")) {
+                mod.GenerateSurface(world, rnd, chunkX shl 4, chunkZ shl 4)
+            } else if (generator.getDebugInfo().equals("HellRandomLevelSource")) {
+                mod.GenerateNether(world, rnd, chunkX shl 4, chunkZ shl 4)
+            }
+        }
+    }
+
+    @Throws(IOException::class)
+    private fun readFromClassPath(source: File) {
+        var source: File = source
+        logger.trace("Adding mods from " + source.getCanonicalPath())
+        val loader = ModLoader::class.java.getClassLoader()
+        if (source.isFile() && (source.getName().endsWith(".jar") || source.getName().endsWith(".zip"))) {
+            logger.trace("Zip found.")
+            val input: InputStream = Files.newInputStream(source.toPath())
+            val zip = ZipInputStream(input)
+            var entry: ZipEntry? = null
+
+            while (true) {
+                entry = zip.getNextEntry()
+                if (entry == null) {
+                    input.close()
+                    break
+                }
+
+                val name = entry.getName()
+                if (!entry.isDirectory() && name.startsWith("mod_") && name.endsWith(".class")) {
+                    addMod(loader, name)
+                }
+            }
+        } else if (source.isDirectory()) {
+            val pkg = ModLoader::class.java.getPackage()
+            if (pkg != null) {
+                val pkgdir: String? = pkg.getName().replace('.', File.separatorChar)
+                source = File(source, pkgdir)
+            }
+
+            logger.trace("Directory found.")
+            val files: Array<File>? = source.listFiles()
+            if (files != null) {
+                for (file in files) {
+                    val name: String = file.getName()
+                    if (file.isFile() && name.startsWith("mod_") && name.endsWith(".class")) {
+                        addMod(loader, name)
+                    }
+                }
+            }
+        }
+    }
+
+    @Throws(
+        IOException::class,
+        IllegalArgumentException::class,
+        IllegalAccessException::class,
+        InvocationTargetException::class,
+        SecurityException::class,
+        NoSuchMethodException::class
+    )
+    private fun readFromModFolder(folder: File) {
+        val loader: ClassLoader = Minecraft::class.java.getClassLoader()
+        val addURL: (Array<Any>) -> Unit = getPrivateFunction<URLClassLoader>("addURL")
+        require(folder.isDirectory()) { "folder must be a Directory." }
+        val sourcefiles: Array<File> = folder.listFiles()
+        if (loader is URLClassLoader) {
+            for (source in sourcefiles) {
+                if (source.isDirectory() || source.isFile() && (source.getName().endsWith(".jar") || source.getName()
+                        .endsWith(".zip"))
+                ) {
+                    addURL.invoke(loader, source.toURI().toURL())
+                }
+            }
+        }
+
+        checkNotNull(sourcefiles)
+        for (sourcefile in sourcefiles) {
+            var source: File = sourcefile
+            if (source.isDirectory() || source.isFile() && (source.getName().endsWith(".jar") || source.getName()
+                    .endsWith(".zip"))
+            ) {
+                logger.trace("Adding mods from " + source.getCanonicalPath())
+                if (!source.isFile()) {
+                    if (source.isDirectory()) {
+                        val pkg = ModLoader::class.java.getPackage()
+                        if (pkg != null) {
+                            val pkgdir: String? = pkg.getName().replace('.', File.separatorChar)
+                            source = File(source, pkgdir)
+                        }
+
+                        logger.trace("Directory found.")
+                        val dirfiles: Array<File>? = source.listFiles()
+                        if (dirfiles != null) {
+                            for (dirfile in dirfiles) {
+                                val name: String = dirfile.getName()
+                                if (dirfile.isFile() && name.startsWith("mod_") && name.endsWith(".class")) {
+                                    addMod(loader, name)
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    logger.trace("Zip found.")
+                    val input: InputStream = Files.newInputStream(source.toPath())
+                    val zip = ZipInputStream(input)
+                    var entry: ZipEntry? = null
+
+                    while (true) {
+                        entry = zip.getNextEntry()
+                        if (entry == null) {
+                            zip.close()
+                            input.close()
+                            break
+                        }
+
+                        val name = entry.getName()
+                        if (!entry.isDirectory() && name.startsWith("mod_") && name.endsWith(".class")) {
+                            addMod(loader, name)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    fun RegisterAllKeys(keys: Array<KeyBinding?>?): Array<KeyBinding?> {
+        val combinedList: MutableList<KeyBinding?> = LinkedList<E?>(Arrays.asList(keys))
+
+        for (keyMap in keyList.values) {
+            combinedList.addAll(keyMap.keys)
+        }
+
+        return combinedList.toTypedArray<KeyBinding?>()
+    }
+
+    fun RegisterAllTextureOverrides(cache: TextureManager) {
+        animList.clear()
+        val game = minecraftInstance
+
+        for (mod in modList) {
+            mod.RegisterAnimation(game)
+        }
+
+        for (anim in animList) {
+            cache.addSprite(anim)
+        }
+
+        for (overlay in overrides.entries) {
+            for (overlayEntry in overlay.value.entries) {
+                val overlayPath = overlayEntry.key
+                val index: Int = overlayEntry.value!!
+                val dst: Int = overlay.key!!
+
+                try {
+                    val im = loadImage(cache, overlayPath)
+                    val anim: TextureAtlas = ModTextureStatic(index, dst, im)
+                    cache.addSprite(anim)
+                } catch (var11: Exception) {
+                    logger.error("Error in RegisterAllTextureOverrides", var11)
+                    ThrowException(var11)
+                    throw RuntimeException(var11)
+                }
+            }
+        }
+    }*/
+
+    @JvmOverloads
+    fun RegisterBlock(block: Block, itemclass: Class<out BlockItem?>? = null) {
+        try {
+            val id = block.id
+            val item: BlockItem? = if (itemclass != null) {
+                itemclass.getConstructor(Integer.TYPE).newInstance(id - 256)
+            } else {
+                BlockItem(id - 256)
+            }
+
+            if (Block.BY_ID[id] != null && Item.BY_ID[id] == null) {
+                Item.BY_ID[id] = item
+            }
+        } catch (var4: IllegalArgumentException) {
+            logger.error("Error in RegisterBlock", var4)
+            ThrowException(var4)
+        } catch (var4: NoSuchMethodException) {
+            logger.error("Error in RegisterBlock", var4)
+            ThrowException(var4)
+        } catch (var4: InvocationTargetException) {
+            logger.error("Error in RegisterBlock", var4)
+            ThrowException(var4)
+        } catch (var4: InstantiationException) {
+            logger.error("Error in RegisterBlock", var4)
+            ThrowException(var4)
+        } catch (var4: SecurityException) {
+            logger.error("Error in RegisterBlock", var4)
+            ThrowException(var4)
+        } catch (var4: IllegalAccessException) {
+            logger.error("Error in RegisterBlock", var4)
+            ThrowException(var4)
+        }
+    }
+
+    /*fun RegisterEntityID(entityClass: Class<out Entity?>?, entityName: String?, id: Int) {
+        try {
+            method_RegisterEntityID.invoke(null, entityClass, entityName, id)
+        } catch (var4: IllegalArgumentException) {
+            logger.error("Error in RegisterEntityID", var4)
+            ThrowException(var4)
+        } catch (var4: InvocationTargetException) {
+            logger.error("Error in RegisterEntityID", var4)
+            ThrowException(var4)
+        } catch (var4: IllegalAccessException) {
+            logger.error("Error in RegisterEntityID", var4)
+            ThrowException(var4)
+        }
+    }
+
+    fun RegisterKey(mod: BaseMod?, keyHandler: KeyBinding?, allowRepeat: Boolean) {
+        var keyMap: MutableMap<KeyBinding?, BooleanArray?>? = keyList.get(mod)
+        if (keyMap == null) {
+            keyMap = HashMap<KeyBinding?, BooleanArray?>()
+        }
+
+        keyMap.put(keyHandler, booleanArrayOf(allowRepeat, false))
+        keyList.put(mod, keyMap)
+    }
+
+    @JvmOverloads
+    fun RegisterTileEntity(
+        tileEntityClass: Class<out BlockEntity?>?,
+        id: String?,
+        renderer: BlockEntityRenderer<*>? = null
+    ) {
+        try {
+            method_RegisterTileEntity.invoke(null, tileEntityClass, id)
+            if (renderer != null) {
+                val ref = BlockEntityRenderDispatcher.INSTANCE
+                val renderers: MutableMap<Class<out BlockEntity?>?, BlockEntityRenderer<*>?> =
+                    field_TileEntityRenderers.get(ref) as MutableMap<*, *>
+                renderers.put(tileEntityClass, renderer)
+                renderer.init(ref)
+            }
+        } catch (var5: IllegalArgumentException) {
+            logger.error("Error in RegisterTileEntity", var5)
+            ThrowException(var5)
+        } catch (var5: InvocationTargetException) {
+            logger.error("Error in RegisterTileEntity", var5)
+            ThrowException(var5)
+        } catch (var5: IllegalAccessException) {
+            logger.error("Error in RegisterTileEntity", var5)
+            ThrowException(var5)
+        }
+    }*/
+
+    fun RemoveSpawn(entityClass: Class<out MobEntity?>, spawnList: MobCategory, vararg biomes: Biome) {
+        val fullBiomes: Array<out Biome> = biomes.ifEmpty { standardBiomes }
+
+        for (biome in fullBiomes) {
+            val list = biome.getSpawnEntries(spawnList)
+            list?.removeIf { entry: Biome.SpawnEntry? -> entry!!.type == entityClass }
+        }
+    }
+
+    fun RemoveSpawn(entityName: String?, spawnList: MobCategory, vararg biomes: Biome) {
+        val entityClass: Class<out Entity> = classMap[entityName]!!
+        if (MobEntity::class.java.isAssignableFrom(entityClass)) {
+            @Suppress("UNCHECKED_CAST")
+            RemoveSpawn(entityClass as Class<out MobEntity>, spawnList, *biomes)
+        }
+    }
+
+    fun RenderBlockIsItemFull3D(modelID: Int): Boolean {
+        return if (!blockSpecialInv.containsKey(modelID)) {
+            modelID == 16
+        } else {
+            blockSpecialInv[modelID]!!
+        }
+    }
+
+    /*fun RenderInvBlock(renderer: BlockRenderer?, block: Block?, metadata: Int, modelID: Int) {
+        val mod: BaseMod? = blockModels.get(modelID)
+        if (mod != null) {
+            mod.RenderInvBlock(renderer, block, metadata, modelID)
+        }
+    }
+
+    fun RenderWorldBlock(
+        renderer: BlockRenderer?,
+        world: WorldView?,
+        x: Int,
+        y: Int,
+        z: Int,
+        block: Block?,
+        modelID: Int
+    ): Boolean {
+        val mod: BaseMod? = blockModels.get(modelID)
+        return mod != null && mod.RenderWorldBlock(renderer, world, x, y, z, block, modelID)
+    }*/
+
+    @Throws(IOException::class)
+    fun saveConfig() {
+        cfgdir.mkdir()
+        if (cfgfile.exists() || cfgfile.createNewFile()) {
+            if (cfgfile.canWrite()) {
+                val out: OutputStream = Files.newOutputStream(cfgfile.toPath())
+                props.store(out, "ModLoader Config")
+                out.close()
+            }
+        }
+    }
+
+    /*fun SetInGameHook(mod: BaseMod?, enable: Boolean, useClock: Boolean) {
+        if (enable) {
+            inGameHooks.put(mod, useClock)
+        } else {
+            inGameHooks.remove(mod)
+        }
+    }
+
+    fun SetInGUIHook(mod: BaseMod?, enable: Boolean, useClock: Boolean) {
+        if (enable) {
+            inGUIHooks.put(mod, useClock)
+        } else {
+            inGUIHooks.remove(mod)
+        }
+    }
+
+    @Throws(IllegalArgumentException::class, SecurityException::class, NoSuchFieldException::class)
+    fun <T, E> setPrivateValue(instanceclass: Class<in T?>, instance: T?, fieldindex: Int, value: E?) {
+        try {
+            val f: Field = instanceclass.getDeclaredFields()[fieldindex]
+            f.setAccessible(true)
+            val modifiers: Int = field_modifiers.getInt(f)
+            if ((modifiers and 16) != 0) {
+                field_modifiers.setInt(f, modifiers and -17)
+            }
+
+            f.set(instance, value)
+        } catch (var6: IllegalAccessException) {
+            logger.error("Error in setPrivateValue", var6)
+            ThrowException("An impossible error has occurred!", var6)
+        }
+    }
+
+    @Throws(IllegalArgumentException::class, SecurityException::class, NoSuchFieldException::class)
+    fun <T, E> setPrivateValue(instanceclass: Class<in T?>, instance: T?, field: String, value: E?) {
+        try {
+            val f: Field = instanceclass.getDeclaredField(field)
+            val modifiers: Int = field_modifiers.getInt(f)
+            if ((modifiers and 16) != 0) {
+                field_modifiers.setInt(f, modifiers and -17)
+            }
+
+            f.setAccessible(true)
+            f.set(instance, value)
+        } catch (var6: IllegalAccessException) {
+            logger.error("Error in setPrivateValue", var6)
+            ThrowException("An impossible error has occurred!", var6)
+        }
+    }
+
+    @Throws(
+        IllegalArgumentException::class,
+        IllegalAccessException::class,
+        IOException::class,
+        SecurityException::class,
+        NoSuchFieldException::class
+    )
+    fun setupProperties(mod: Class<out BaseMod?>) {
+        val modprops = Properties()
+        val modcfgfile: File = File(cfgdir, mod.getName() + ".cfg")
+        if (modcfgfile.exists() && modcfgfile.canRead()) {
+            modprops.load(Files.newInputStream(modcfgfile.toPath()))
+        }
+
+        val helptext = StringBuilder()
+
+        val var7: Array<Field>?
+        for (field in mod.getFields().also { var7 = it }) {
+            if ((field.getModifiers() and 8) !== 0 && field.isAnnotationPresent(MLProp::class.java)) {
+                val type = field.getType()
+                val annotation: MLProp = field.getAnnotation(MLProp::class.java)
+                val key = if (annotation.name().length() === 0) field.getName() else annotation.name()
+                val currentvalue = field.get(null)
+                val range = StringBuilder()
+                if (annotation.min() !== Double.NEGATIVE_INFINITY) {
+                    range.append(String.format(",>=%.1f", annotation.min()))
+                }
+
+                if (annotation.max() !== Double.POSITIVE_INFINITY) {
+                    range.append(String.format(",<=%.1f", annotation.max()))
+                }
+
+                val info = StringBuilder()
+                if (annotation.info().length() > 0) {
+                    info.append(" -- ")
+                    info.append(annotation.info())
+                }
+
+                helptext.append(
+                    kotlin.String.format(
+                        "%s (%s:%s%s)%s\n",
+                        key,
+                        type.getName(),
+                        currentvalue,
+                        range,
+                        info
+                    )
+                )
+                if (modprops.containsKey(key)) {
+                    val strvalue = modprops.getProperty(key)
+                    var value: Any? = null
+                    if (type.isAssignableFrom(kotlin.String::class.java)) {
+                        value = strvalue
+                    } else if (type.isAssignableFrom(Integer.TYPE)) {
+                        value = strvalue.toInt()
+                    } else if (type.isAssignableFrom(Short.TYPE)) {
+                        value = strvalue.toShort()
+                    } else if (type.isAssignableFrom(Byte.TYPE)) {
+                        value = strvalue.toByte()
+                    } else if (type.isAssignableFrom(java.lang.Boolean.TYPE)) {
+                        value = strvalue.toBoolean()
+                    } else if (type.isAssignableFrom(Float.TYPE)) {
+                        value = strvalue.toFloat()
+                    } else if (type.isAssignableFrom(Double.TYPE)) {
+                        value = strvalue.toDouble()
+                    }
+
+                    if (value != null) {
+                        if (value is Number) {
+                            val num = value.toDouble()
+                            if (annotation.min() !== kotlin.Double.NEGATIVE_INFINITY && num < annotation.min()
+                                || annotation.max() !== kotlin.Double.POSITIVE_INFINITY && num > annotation.max()
+                            ) {
+                                continue
+                            }
+                        }
+
+                        logger.trace(key + " set to " + value)
+                        if (value != currentvalue) {
+                            field.set(null, value)
+                        }
+                    }
+                } else {
+                    logger.trace(key + " not in config, using default: " + currentvalue)
+                    modprops.setProperty(key, currentvalue.toString())
+                }
+            }
+        }
+
+        if (!modprops.isEmpty() && (modcfgfile.exists() || modcfgfile.createNewFile()) && modcfgfile.canWrite()) {
+            modprops.store(Files.newOutputStream(modcfgfile.toPath()), helptext.toString())
+        }
+    }
+
+    fun TakenFromCrafting(player: PlayerEntity?, item: ItemStack?, matrix: Inventory?) {
+        for (mod in modList) {
+            mod.TakenFromCrafting(player, item, matrix)
+        }
+    }
+
+    fun TakenFromFurnace(player: PlayerEntity?, item: ItemStack?) {
+        for (mod in modList) {
+            mod.TakenFromFurnace(player, item)
+        }
+    }*/
+
+    @Suppress("unused", "FunctionName")
+    fun ThrowException(message: String, e: Throwable) {
+        val game = minecraftInstance
+        game.handleCrash(CrashReport(message, e))
+    }
+
+    private fun ThrowException(e: Throwable) {
+        ThrowException("Exception occurred in ModLoader", e)
+    }
+}
