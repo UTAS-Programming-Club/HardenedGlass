@@ -26,17 +26,8 @@ import net.minecraft.world.biome.HellBiome
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 import java.awt.image.BufferedImage
-import java.io.File
-import java.io.IOException
-import java.io.InputStream
-import java.io.OutputStream
 import java.lang.reflect.InvocationTargetException
-import java.nio.file.Files
 import java.util.LinkedList
-import java.util.Properties
-import java.util.logging.FileHandler
-import java.util.logging.Level
-import java.util.logging.SimpleFormatter
 import javax.imageio.ImageIO
 import kotlin.collections.ifEmpty
 import kotlin.collections.toTypedArray
@@ -48,13 +39,10 @@ import kotlin.reflect.jvm.isAccessible
 // Used under MIT License
 
 @Suppress("unused", "FunctionName", "GrazieInspection", "SpellCheckingInspection")
-object ModLoader {
+object Helpers {
     private val animList: MutableList<DynamicTexture> = LinkedList<DynamicTexture>()
     // private val blockModels: MutableMap<Int?, BaseMod?> = HashMap<Int?, BaseMod?>()
     private val blockSpecialInv: MutableMap<Int, Boolean> = HashMap()
-    private val cfgdir: File = File(Minecraft.getWorkingDirectory(), "/config/")
-    private val cfgfile: File = File(cfgdir, "ModLoader.cfg")
-    var cfgLoggingLevel: Level = Level.FINER
     private lateinit var classMap: Map<String, Class<out Entity>>
     /*private var clock = 0L
     const val DEBUG: Boolean = false*/
@@ -62,7 +50,6 @@ object ModLoader {
     // private var field_armorList: Field? = null
     // private var field_modifiers: Field? = null
     // private var field_TileEntityRenderers: Field? = null
-    private var hasInit = false
     private var highestEntityId = 3000
     /*private val inGameHooks: MutableMap<BaseMod?, Boolean?> = HashMap<BaseMod?, Boolean?>()
     private val inGUIHooks: MutableMap<BaseMod?, Boolean?> = HashMap<BaseMod?, Boolean?>()*/
@@ -70,16 +57,11 @@ object ModLoader {
     private var itemSpritesLeft = 0
     /*private val keyList: MutableMap<BaseMod?, MutableMap<KeyBinding?, BooleanArray?>> =
         HashMap<BaseMod?, MutableMap<KeyBinding?, BooleanArray?>>()*/
-    private val logfile: File = File(Minecraft.getWorkingDirectory(), "ModLoader.txt")
     private val logger: Logger = LogManager.getLogger("ModLoader")
-    private var logHandler: FileHandler? = null
     /*private var method_RegisterEntityID: Method? = null
-    private var method_RegisterTileEntity: Method? = null*/
-    private val modDir: File = File(Minecraft.getWorkingDirectory(), "/mods/")
-    /*private val modList: LinkedList<BaseMod> = LinkedList<BaseMod>()
+    private var method_RegisterTileEntity: Method? = null
     private var nextBlockModelID = 1000*/
     private val overrides: MutableMap<Int, MutableMap<String, Int>> = HashMap()
-    val props: Properties = Properties()
     private lateinit var standardBiomes: Array<Biome>
     private var terrainSpriteIndex = 0
     private var terrainSpritesLeft = 0
@@ -87,25 +69,8 @@ object ModLoader {
     private var texturesAdded = false
     private val usedItemSprites = BooleanArray(256)
     private val usedTerrainSprites = BooleanArray(256)
-    /*const val VERSION: String = "ModLoader Beta 1.8.1"
 
-    private val G_BlockRenderer_cfgGrassFix: MethodHandle
-    private val S_BlockRenderer_cfgGrassFix: MethodHandle*/
-
-    /*init {
-        try {
-            G_BlockRenderer_cfgGrassFix = MethodHandles.lookup()
-                .findStaticGetter(BlockRenderer::class.java, "cfgGrassFix", Boolean::class.javaPrimitiveType)
-            S_BlockRenderer_cfgGrassFix = MethodHandles.lookup()
-                .findStaticSetter(BlockRenderer::class.java, "cfgGrassFix", Boolean::class.javaPrimitiveType)
-        } catch (e: NoSuchFieldException) {
-            throw RuntimeException(e)
-        } catch (e: IllegalAccessException) {
-            throw RuntimeException(e)
-        }
-    }
-
-    fun AddAchievementDesc(achievement: AchievementStat, name: String?, description: String?) {
+    /*fun AddAchievementDesc(achievement: AchievementStat, name: String?, description: String?) {
         try {
             if (achievement.name.contains(".")) {
                 val split: Array<String?> = achievement.name.split("\\.")
@@ -206,37 +171,6 @@ object ModLoader {
     fun AddLocalization(key: String, value: String) {
         Language.getInstance().translations[key] = value
     }
-
-    /*private fun addMod(loader: ClassLoader, filename: String) {
-        try {
-            val name = filename.split("\\.".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()[0]
-            if (name.contains("$")) {
-                return
-            }
-
-            if (props.containsKey(name) && (props.getProperty(name)
-                    .equals("no", ignoreCase = true) || props.getProperty(name).equals("off", ignoreCase = true))
-            ) {
-                return
-            }
-
-            val instclass = loader.loadClass(name)
-            if (!BaseMod::class.java.isAssignableFrom(instclass)) {
-                return
-            }
-
-            setupProperties(instclass as Class<out BaseMod?>)
-            val mod: BaseMod = instclass.newInstance() as BaseMod
-            modList.add(mod)
-            logger.trace("Mod Loaded: \"" + mod + "\" from " + filename)
-            println("Mod Loaded: " + mod)
-        } catch (var6: Throwable) {
-            logger.trace("Failed to load mod from \"" + filename + "\"")
-            println("Failed to load mod from \"" + filename + "\"")
-            logger.error("Error in addMod", var6)
-            ThrowException(var6)
-        }
-    }*/
 
     fun AddName(item: Item, name: String) {
         var tag: String? = null
@@ -391,27 +325,6 @@ object ModLoader {
         return result
     }
 
-    val loadedMods: MutableList<BaseMod>
-        get() = Collections.unmodifiableList<BaseMod?>(modList)
-
-    fun getLogger(): Logger {
-        return object : Logger("ModLoader", null) {
-            fun fromJava(level: Level?): Level {
-                if (level === Level.ALL) return Level.ALL
-                if (level === Level.CONFIG) return Level.INFO
-                if (level === Level.FINE || level === Level.FINER || level === Level.FINEST) return Level.DEBUG
-                if (level === Level.INFO) return Level.INFO
-                if (level === Level.SEVERE) return Level.ERROR
-                if (level === Level.WARNING) return Level.WARN
-                return Level.OFF
-            }
-
-            public override fun log(level: Level?, msg: String?) {
-                logger.log(fromJava(level), msg)
-            }
-        }
-    }
-
     fun getUniqueBlockModelID(mod: BaseMod?, full3DItem: Boolean): Int {
         val id = nextBlockModelID++
         blockModels.put(id, mod)
@@ -476,7 +389,6 @@ object ModLoader {
         }
 
     fun init() {
-        hasInit = true
         val usedItemSpritesString =
             "1111111111111111111111111111111111111101111111011111111111111001111111111111111111111111111011111111100110000011111110000000001111111001100000110000000100000011000000010000001100000000000000110000000000000000000000000000000000000000000000001100000000000000"
         val usedTerrainSpritesString =
@@ -553,42 +465,12 @@ object ModLoader {
         }
 
         try {
-            loadConfig()
-            /*if (props.containsKey("grassFix")) {
-                S_BlockRenderer_cfgGrassFix.invoke(props.getProperty("grassFix").toBoolean())
-            }*/
-
-            if ((logfile.exists() || logfile.createNewFile()) && logfile.canWrite() && logHandler == null) {
-                logHandler = FileHandler(logfile.path)
-                logHandler!!.formatter = SimpleFormatter()
-            }
-
-            logger.trace("ModLoader Beta 1.8.1 Initializing...")
-            println("ModLoader Beta 1.8.1 Initializing...")
-            //			File source = new File(ModLoader.class.getProtectionDomain().getCodeSource().getLocation().toURI());
-            modDir.mkdirs()
-            //			readFromModFolder(modDir);
-//			readFromClassPath(source);
-            // RgmlLoadSystem.locateMods(modList)
-            println("Done.")
-            props.setProperty("loggingLevel", cfgLoggingLevel.name)
-            // props.setProperty("grassFix", (G_BlockRenderer_cfgGrassFix.invoke() as Boolean).toString())
-
-            /*for (mod in modList) {
-                mod.ModsLoaded()
-                if (!props.containsKey(mod.getClass().getName())) {
-                    props.setProperty(mod.getClass().getName(), "on")
-                }
-            }*/
-
             // instance!!.options.keyBindings = RegisterAllKeys(instance!!.options.keyBindings)
             // instance!!.options.load()
             initStats()
-            saveConfig()
         } catch (var9: Throwable) {
             logger.error("Error in init", var9)
             ThrowException("ModLoader has failed to initialize.", var9)
-            logHandler?.close()
 
             throw RuntimeException(var9)
         }
@@ -648,36 +530,6 @@ object ModLoader {
         }
     }
 
-    /*fun isModLoaded(modname: String?): Boolean {
-        var chk: Class<*>? = null
-
-        try {
-            chk = Class.forName(modname)
-        } catch (var4: ClassNotFoundException) {
-            return false
-        }
-
-        for (mod in modList) {
-            if (chk.isInstance(mod)) {
-                return true
-            }
-        }
-
-        return false
-    }*/
-
-    @Throws(IOException::class)
-    fun loadConfig() {
-        cfgdir.mkdir()
-        if (cfgfile.exists() || cfgfile.createNewFile()) {
-            if (cfgfile.canRead()) {
-                val `in`: InputStream = Files.newInputStream(cfgfile.toPath())
-                props.load(`in`)
-                `in`.close()
-            }
-        }
-    }
-
     @Throws(Exception::class)
     fun loadImage(texCache: TextureManager, path: String): BufferedImage {
         val pack: TexturePacks = texCache.texturePacks
@@ -701,11 +553,6 @@ object ModLoader {
     }*/
 
     fun OnTick(tick: Float, game: Minecraft) {
-        if (!hasInit) {
-            init()
-            logger.trace("Initialized")
-        }
-
         if (texPack == null || game.options.skin !== texPack) {
             texturesAdded = false
             texPack = game.options.skin
@@ -763,11 +610,6 @@ object ModLoader {
     }
 
     fun OpenGUI(player: PlayerEntity, gui: Screen?) {
-        if (!hasInit) {
-            init()
-            logger.trace("Initialized")
-        }
-
         val game = Minecraft.INSTANCE
         if (game.player === player && gui != null) {
             game.openScreen(gui)
@@ -790,122 +632,6 @@ object ModLoader {
                 mod.GenerateSurface(world, rnd, chunkX shl 4, chunkZ shl 4)
             } else if (generator.getDebugInfo().equals("HellRandomLevelSource")) {
                 mod.GenerateNether(world, rnd, chunkX shl 4, chunkZ shl 4)
-            }
-        }
-    }
-
-    @Throws(IOException::class)
-    private fun readFromClassPath(source: File) {
-        var source: File = source
-        logger.trace("Adding mods from " + source.getCanonicalPath())
-        val loader = ModLoader::class.java.getClassLoader()
-        if (source.isFile() && (source.getName().endsWith(".jar") || source.getName().endsWith(".zip"))) {
-            logger.trace("Zip found.")
-            val input: InputStream = Files.newInputStream(source.toPath())
-            val zip = ZipInputStream(input)
-            var entry: ZipEntry? = null
-
-            while (true) {
-                entry = zip.getNextEntry()
-                if (entry == null) {
-                    input.close()
-                    break
-                }
-
-                val name = entry.getName()
-                if (!entry.isDirectory() && name.startsWith("mod_") && name.endsWith(".class")) {
-                    addMod(loader, name)
-                }
-            }
-        } else if (source.isDirectory()) {
-            val pkg = ModLoader::class.java.getPackage()
-            if (pkg != null) {
-                val pkgdir: String? = pkg.getName().replace('.', File.separatorChar)
-                source = File(source, pkgdir)
-            }
-
-            logger.trace("Directory found.")
-            val files: Array<File>? = source.listFiles()
-            if (files != null) {
-                for (file in files) {
-                    val name: String = file.getName()
-                    if (file.isFile() && name.startsWith("mod_") && name.endsWith(".class")) {
-                        addMod(loader, name)
-                    }
-                }
-            }
-        }
-    }
-
-    @Throws(
-        IOException::class,
-        IllegalArgumentException::class,
-        IllegalAccessException::class,
-        InvocationTargetException::class,
-        SecurityException::class,
-        NoSuchMethodException::class
-    )
-    private fun readFromModFolder(folder: File) {
-        val loader: ClassLoader = Minecraft::class.java.getClassLoader()
-        val addURL: (Array<Any>) -> Unit = getPrivateFunction<URLClassLoader>("addURL")
-        require(folder.isDirectory()) { "folder must be a Directory." }
-        val sourcefiles: Array<File> = folder.listFiles()
-        if (loader is URLClassLoader) {
-            for (source in sourcefiles) {
-                if (source.isDirectory() || source.isFile() && (source.getName().endsWith(".jar") || source.getName()
-                        .endsWith(".zip"))
-                ) {
-                    addURL.invoke(loader, source.toURI().toURL())
-                }
-            }
-        }
-
-        checkNotNull(sourcefiles)
-        for (sourcefile in sourcefiles) {
-            var source: File = sourcefile
-            if (source.isDirectory() || source.isFile() && (source.getName().endsWith(".jar") || source.getName()
-                    .endsWith(".zip"))
-            ) {
-                logger.trace("Adding mods from " + source.getCanonicalPath())
-                if (!source.isFile()) {
-                    if (source.isDirectory()) {
-                        val pkg = ModLoader::class.java.getPackage()
-                        if (pkg != null) {
-                            val pkgdir: String? = pkg.getName().replace('.', File.separatorChar)
-                            source = File(source, pkgdir)
-                        }
-
-                        logger.trace("Directory found.")
-                        val dirfiles: Array<File>? = source.listFiles()
-                        if (dirfiles != null) {
-                            for (dirfile in dirfiles) {
-                                val name: String = dirfile.getName()
-                                if (dirfile.isFile() && name.startsWith("mod_") && name.endsWith(".class")) {
-                                    addMod(loader, name)
-                                }
-                            }
-                        }
-                    }
-                } else {
-                    logger.trace("Zip found.")
-                    val input: InputStream = Files.newInputStream(source.toPath())
-                    val zip = ZipInputStream(input)
-                    var entry: ZipEntry? = null
-
-                    while (true) {
-                        entry = zip.getNextEntry()
-                        if (entry == null) {
-                            zip.close()
-                            input.close()
-                            break
-                        }
-
-                        val name = entry.getName()
-                        if (!entry.isDirectory() && name.startsWith("mod_") && name.endsWith(".class")) {
-                            addMod(loader, name)
-                        }
-                    }
-                }
             }
         }
     }
@@ -985,7 +711,7 @@ object ModLoader {
         }
     }
 
-    /*fun RegisterEntityID(entityClass: Class<out Entity?>?, entityName: String, id: Int) {
+    /*fun RegisterEntityID(entityClass: Class<out Entity?>?, entityName: String?, id: Int) {
         try {
             method_RegisterEntityID.invoke(null, entityClass, entityName, id)
         } catch (var4: IllegalArgumentException) {
@@ -1080,21 +806,9 @@ object ModLoader {
     ): Boolean {
         val mod: BaseMod? = blockModels.get(modelID)
         return mod != null && mod.RenderWorldBlock(renderer, world, x, y, z, block, modelID)
-    }*/
-
-    @Throws(IOException::class)
-    fun saveConfig() {
-        cfgdir.mkdir()
-        if (cfgfile.exists() || cfgfile.createNewFile()) {
-            if (cfgfile.canWrite()) {
-                val out: OutputStream = Files.newOutputStream(cfgfile.toPath())
-                props.store(out, "ModLoader Config")
-                out.close()
-            }
-        }
     }
 
-    /*fun SetInGameHook(mod: BaseMod?, enable: Boolean, useClock: Boolean) {
+    fun SetInGameHook(mod: BaseMod?, enable: Boolean, useClock: Boolean) {
         if (enable) {
             inGameHooks.put(mod, useClock)
         } else {
@@ -1141,100 +855,6 @@ object ModLoader {
         } catch (var6: IllegalAccessException) {
             logger.error("Error in setPrivateValue", var6)
             ThrowException("An impossible error has occurred!", var6)
-        }
-    }
-
-    @Throws(
-        IllegalArgumentException::class,
-        IllegalAccessException::class,
-        IOException::class,
-        SecurityException::class,
-        NoSuchFieldException::class
-    )
-    fun setupProperties(mod: Class<out BaseMod?>) {
-        val modprops = Properties()
-        val modcfgfile: File = File(cfgdir, mod.getName() + ".cfg")
-        if (modcfgfile.exists() && modcfgfile.canRead()) {
-            modprops.load(Files.newInputStream(modcfgfile.toPath()))
-        }
-
-        val helptext = StringBuilder()
-
-        val var7: Array<Field>?
-        for (field in mod.getFields().also { var7 = it }) {
-            if ((field.getModifiers() and 8) !== 0 && field.isAnnotationPresent(MLProp::class.java)) {
-                val type = field.getType()
-                val annotation: MLProp = field.getAnnotation(MLProp::class.java)
-                val key = if (annotation.name().length() === 0) field.getName() else annotation.name()
-                val currentvalue = field.get(null)
-                val range = StringBuilder()
-                if (annotation.min() !== Double.NEGATIVE_INFINITY) {
-                    range.append(String.format(",>=%.1f", annotation.min()))
-                }
-
-                if (annotation.max() !== Double.POSITIVE_INFINITY) {
-                    range.append(String.format(",<=%.1f", annotation.max()))
-                }
-
-                val info = StringBuilder()
-                if (annotation.info().length() > 0) {
-                    info.append(" -- ")
-                    info.append(annotation.info())
-                }
-
-                helptext.append(
-                    kotlin.String.format(
-                        "%s (%s:%s%s)%s\n",
-                        key,
-                        type.getName(),
-                        currentvalue,
-                        range,
-                        info
-                    )
-                )
-                if (modprops.containsKey(key)) {
-                    val strvalue = modprops.getProperty(key)
-                    var value: Any? = null
-                    if (type.isAssignableFrom(kotlin.String::class.java)) {
-                        value = strvalue
-                    } else if (type.isAssignableFrom(Integer.TYPE)) {
-                        value = strvalue.toInt()
-                    } else if (type.isAssignableFrom(Short.TYPE)) {
-                        value = strvalue.toShort()
-                    } else if (type.isAssignableFrom(Byte.TYPE)) {
-                        value = strvalue.toByte()
-                    } else if (type.isAssignableFrom(java.lang.Boolean.TYPE)) {
-                        value = strvalue.toBoolean()
-                    } else if (type.isAssignableFrom(Float.TYPE)) {
-                        value = strvalue.toFloat()
-                    } else if (type.isAssignableFrom(Double.TYPE)) {
-                        value = strvalue.toDouble()
-                    }
-
-                    if (value != null) {
-                        if (value is Number) {
-                            val num = value.toDouble()
-                            if (annotation.min() !== kotlin.Double.NEGATIVE_INFINITY && num < annotation.min()
-                                || annotation.max() !== kotlin.Double.POSITIVE_INFINITY && num > annotation.max()
-                            ) {
-                                continue
-                            }
-                        }
-
-                        logger.trace(key + " set to " + value)
-                        if (value != currentvalue) {
-                            field.set(null, value)
-                        }
-                    }
-                } else {
-                    logger.trace(key + " not in config, using default: " + currentvalue)
-                    modprops.setProperty(key, currentvalue.toString())
-                }
-            }
-        }
-
-        if (!modprops.isEmpty() && (modcfgfile.exists() || modcfgfile.createNewFile()) && modcfgfile.canWrite()) {
-            modprops.store(Files.newOutputStream(modcfgfile.toPath()), helptext.toString())
         }
     }
 
