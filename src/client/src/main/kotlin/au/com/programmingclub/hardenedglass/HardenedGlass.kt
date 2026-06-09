@@ -4,10 +4,9 @@ import net.minecraft.block.Block
 import net.minecraft.block.GlassBlock
 import net.minecraft.block.material.Material
 import net.minecraft.item.ItemStack
-import net.ornithemc.osl.entrypoints.api.ModInitializer
 
 class HardenedGlassBlock : GlassBlock {
-    constructor() : super(100, 49, Material.GLASS, false) {
+    constructor() : super(100, ModLoader.addOverride("/terrain.png", "/assets/hardenedglass/textures/block/hardened_glass/hardened_glass.png"), Material.GLASS, false) {
         setStrength(10f)
         setBlastResistance(9f)
         setSounds(GLASS_SOUNDS)
@@ -15,12 +14,10 @@ class HardenedGlassBlock : GlassBlock {
     }
 }
 
-class HardenedGlass : ModInitializer {
+object HardenedGlass {
     private val HardenedGlassBlock: Block = HardenedGlassBlock()
 
-    override fun init() {
-        ModLoader.init()
-
+    fun onReady() {
         ModLoader.RegisterBlock(HardenedGlassBlock)
         ModLoader.AddName(HardenedGlassBlock, "Hardened Glass")
         ModLoader.AddSmelting(Block.GLASS, ItemStack(HardenedGlassBlock))
