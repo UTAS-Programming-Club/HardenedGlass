@@ -236,7 +236,6 @@ object Helpers {
             else -> return
         }
 
-        println("Overriding $path with $overlayPath @ $index. $left left.")
         logger.trace("addOverride($path,$overlayPath,$index). $left left.")
         val overlays = overrides.computeIfAbsent(var6.toInt()) { _: Int -> HashMap() }
 

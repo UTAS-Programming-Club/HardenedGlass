@@ -26,9 +26,10 @@
 	"mixins": [
 		"hardenedglass.mixins.json"
 	],
+	"accessWidener": "hardenedglass.accesswidener",
 	"depends": {
 		"fabricloader": ">=${loader_version}",
-		"minecraft": "1.0.0-beta.7.3",
+		"minecraft": "1.0.0-beta.${minecraft_minor_version}",
 		"java": ">=8",
 		"osl-entrypoints": ">=0.4.0",
 		"fabric-language-kotlin": ">=${fabric_kotlin_version}+kotlin.${kotlin_version}"

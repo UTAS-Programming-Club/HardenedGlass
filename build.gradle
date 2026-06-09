@@ -35,7 +35,7 @@ def configure(project) {
 	project.loom {
 		if (project.environment == 'client') {
 			clientOnlyMinecraftJar()
-			accessWidenerPath = file('src/client/src/main/resources/hardenedglass.accessWidener')
+			accessWidenerPath = file('src/client/src/main/resources/hardenedglass.accesswidener')
 		}
 		if (project.environment == 'server') {
 			serverOnlyMinecraftJar()
