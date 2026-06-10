@@ -1,12 +1,13 @@
 package au.com.programmingclub.hardenedglass
 
+import net.fabricmc.loader.api.FabricLoader
+import net.fabricmc.loader.api.ModContainer
 import net.minecraft.block.Block
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screen.Screen
 import net.minecraft.client.render.entity.PlayerRenderer
 import net.minecraft.client.render.texture.DynamicTexture
 import net.minecraft.client.render.texture.TextureManager
-import net.minecraft.client.resource.pack.TexturePacks
 import net.minecraft.crafting.CraftingManager
 import net.minecraft.entity.Entities
 import net.minecraft.entity.Entity
@@ -20,6 +21,7 @@ import net.minecraft.world.biome.HellBiome
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 import java.awt.image.BufferedImage
+import java.io.File
 import java.lang.reflect.InvocationTargetException
 import javax.imageio.ImageIO
 import kotlin.collections.toTypedArray
@@ -527,17 +529,14 @@ object Helpers {
 
     @Throws(Exception::class)
     fun loadImage(texCache: TextureManager, path: String): BufferedImage {
-        val pack: TexturePacks = texCache.texturePacks
-        val input = pack.selected.getResource(path)
-        if (input == null) {
-            throw Exception("Image not found: $path")
+        val mod: ModContainer = FabricLoader.getInstance().getModContainer("hardenedglass").get()
+        val relativePath: String = path.substring(1)
+        val file: File = mod.findPath(relativePath).get().toFile()
+        val image: BufferedImage? = ImageIO.read(file)
+        if (image == null) {
+            throw Exception("Image corrupted: $path")
         } else {
-            val image = ImageIO.read(input)
-            if (image == null) {
-                throw Exception("Image corrupted: $path")
-            } else {
-                return image
-            }
+            return image
         }
     }
 
@@ -548,11 +547,6 @@ object Helpers {
     }*/
 
     fun OnTick(tick: Float, game: Minecraft) {
-        if (texPack == null || game.options.skin !== texPack) {
-            texturesAdded = false
-            texPack = game.options.skin
-        }
-
         if (!texturesAdded && game.textureManager != null) {
             RegisterAllTextureOverrides(game.textureManager)
             texturesAdded = true
