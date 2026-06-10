@@ -16,8 +16,6 @@ import net.minecraft.item.BlockItem
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraft.util.crash.CrashReport
-import net.minecraft.world.biome.Biome
-import net.minecraft.world.biome.HellBiome
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 import java.awt.image.BufferedImage
@@ -25,8 +23,6 @@ import java.io.File
 import java.lang.reflect.InvocationTargetException
 import javax.imageio.ImageIO
 import kotlin.collections.toTypedArray
-import kotlin.reflect.full.staticProperties
-import kotlin.reflect.jvm.isAccessible
 
 // Partial port of rgml-quilt's version of ModLoader to beta 1.7.3
 // https://github.com/sschr15/rgml-quilt/blob/f0e4c913fc7cac8b3c3fbcc2d6b64c70a0837c12/src/main/risugami/org/duvetmc/rgml/ModLoader.java
@@ -57,7 +53,7 @@ object Helpers {
     private var method_RegisterTileEntity: Method? = null
     private var nextBlockModelID = 1000*/
     private val overrides: MutableMap<Int, MutableMap<String, Int>> = mutableMapOf()
-    private lateinit var standardBiomes: Array<Biome>
+    // private lateinit var standardBiomes: Array<Biome>
     private var terrainSpriteIndex = 0
     private var terrainSpritesLeft = 0
     private var texPack: String? = null
@@ -417,7 +413,7 @@ object Helpers {
             // field_animList = TextureManager::class.java.getDeclaredFields()[6]
             // field_animList!!.setAccessible(true)
 
-            standardBiomes = Biome::class.staticProperties.mapNotNull {
+            /*standardBiomes = Biome::class.staticProperties.mapNotNull {
                 it.isAccessible = true
                 val biome: Any? = it.get()
                 if (biome is Biome && (biome !is HellBiome/* && biome !is TheEndBiome*/)) {
@@ -425,7 +421,7 @@ object Helpers {
                 } else {
                     null
                 }
-            }.toTypedArray()
+            }.toTypedArray()*/
 
             /*method_RegisterTileEntity = RuntimeRemapUtil.getRuntimeDeclaredMethod(
                 BlockEntity::class.java, "a", arrayOf<Class<*>>(
@@ -667,11 +663,11 @@ object Helpers {
     }
 
     @JvmOverloads
-    fun RegisterBlock(block: Block, itemclass: Class<out BlockItem?>? = null) {
+    fun RegisterBlock(block: Block, itemClass: Class<out BlockItem>? = null) {
         try {
             val id = block.id
-            val item: BlockItem = if (itemclass != null) {
-                itemclass.getConstructor(Integer.TYPE).newInstance(id - 256)
+            val item: BlockItem = if (itemClass != null) {
+                itemClass.getConstructor(Integer.TYPE).newInstance(id - 256)
             } else {
                 BlockItem(id - 256)
             }
@@ -859,7 +855,6 @@ object Helpers {
         }
     }*/
 
-    @Suppress("unused", "FunctionName")
     fun ThrowException(message: String, e: Throwable) {
         minecraftInstance.handleCrash(CrashReport(message, e))
     }

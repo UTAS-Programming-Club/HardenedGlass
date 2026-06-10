@@ -4,7 +4,8 @@
 	"package": "au.com.programmingclub.hardenedglass.mixin",
 	"compatibilityLevel": "JAVA_8",
 	"server": [
-		"MinecraftServerMixin"
+		"MinecraftServerMixin",
+		"FurnaceBlockEntityMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
