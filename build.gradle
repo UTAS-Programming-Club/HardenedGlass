@@ -17,7 +17,7 @@ def configure(project) {
 	project.apply plugin: 'java'
 	project.apply plugin: 'org.jetbrains.kotlin.jvm'
 
-	project.version = "${mod_version}+mc${minecraft_version}"
+	project.version = "${mod_version}+mc${project.minecraft_version}"
 	project.maven_group = maven_group
 
 	project.base {
@@ -52,12 +52,12 @@ def configure(project) {
 	}
 
 	project.dependencies {
-		minecraft "com.mojang:minecraft:${minecraft_version}"
+		minecraft "com.mojang:minecraft:${project.minecraft_version}"
 		modImplementation "net.fabricmc:fabric-loader:${loader_version}"
 
-		exceptions project.ploceus.raven(project.raven_build)
-		signatures project.ploceus.sparrow(project.sparrow_build)
-		nests project.ploceus.nests(project.nests_build)
+		exceptions "net.ornithemc:raven:${project.minecraft_version}+build.${project.raven_build}"
+		signatures "net.ornithemc:sparrow:${project.minecraft_version}+build.${project.sparrow_build}"
+		nests "net.ornithemc:nests:${project.minecraft_version}+build.${project.nests_build}"
 		mappings project.ploceus.featherMappings(project.feather_build)
 
 		project.ploceus.dependOsl(osl_version, project.environment)

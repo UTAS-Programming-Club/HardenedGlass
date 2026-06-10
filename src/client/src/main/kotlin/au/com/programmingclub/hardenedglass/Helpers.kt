@@ -14,7 +14,6 @@ import net.minecraft.entity.mob.player.PlayerEntity
 import net.minecraft.item.BlockItem
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
-import net.minecraft.locale.Language
 import net.minecraft.util.crash.CrashReport
 import net.minecraft.world.biome.Biome
 import net.minecraft.world.biome.HellBiome
@@ -164,7 +163,7 @@ object Helpers {
         return combinedList.indexOf(armor)
     }
 
-    fun AddLocalization(key: String, value: String) {
+    /*fun AddLocalization(key: String, value: String) {
         Language.getInstance().translations[key] = value
     }
 
@@ -203,7 +202,7 @@ object Helpers {
             logger.error("Error in AddName", e)
             ThrowException(e)
         }
-    }
+    }*/
 
     fun addOverride(fileToOverride: String, fileToAdd: String): Int {
         try {

@@ -10,7 +10,7 @@ class HardenedGlassBlock : GlassBlock {
         setStrength(10f)
         setBlastResistance(9f)
         setSounds(GLASS_SOUNDS)
-        setKey("hardened_glass")
+        // setKey("hardened_glass")
     }
 }
 
@@ -19,7 +19,7 @@ object HardenedGlass {
 
     fun onReady() {
         Helpers.RegisterBlock(HardenedGlassBlock)
-        Helpers.AddName(HardenedGlassBlock, "Hardened Glass")
+        // Helpers.AddName(HardenedGlassBlock, "Hardened Glass")
         Helpers.AddSmelting(Block.GLASS, ItemStack(HardenedGlassBlock))
     }
 }
