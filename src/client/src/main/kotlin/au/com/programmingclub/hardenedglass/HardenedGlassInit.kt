@@ -7,12 +7,12 @@ import net.ornithemc.osl.lifecycle.api.MinecraftEvents
 class HardenedGlassInit : ModInitializer {
     override fun init() {
         MinecraftEvents.READY.register {
-            Helpers.init()
+            Helpers.init(it)
             HardenedGlass.onReady()
         }
 
         MinecraftEvents.TICK_START.register {
-            Helpers.OnTick(0.0f, Minecraft.INSTANCE)
+            Helpers.OnTick(0.0f, it)
         }
     }
 }

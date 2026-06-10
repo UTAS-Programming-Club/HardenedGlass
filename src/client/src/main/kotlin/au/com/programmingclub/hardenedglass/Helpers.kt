@@ -8,18 +8,13 @@ import net.minecraft.client.render.texture.DynamicTexture
 import net.minecraft.client.render.texture.TextureManager
 import net.minecraft.client.resource.pack.TexturePacks
 import net.minecraft.crafting.CraftingManager
-import net.minecraft.crafting.SmeltingManager
 import net.minecraft.entity.Entities
 import net.minecraft.entity.Entity
-import net.minecraft.entity.mob.MobCategory
-import net.minecraft.entity.mob.MobEntity
 import net.minecraft.entity.mob.player.PlayerEntity
 import net.minecraft.item.BlockItem
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraft.locale.Language
-import net.minecraft.stat.ItemStat
-import net.minecraft.stat.Stats
 import net.minecraft.util.crash.CrashReport
 import net.minecraft.world.biome.Biome
 import net.minecraft.world.biome.HellBiome
@@ -27,9 +22,7 @@ import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 import java.awt.image.BufferedImage
 import java.lang.reflect.InvocationTargetException
-import java.util.LinkedList
 import javax.imageio.ImageIO
-import kotlin.collections.ifEmpty
 import kotlin.collections.toTypedArray
 import kotlin.reflect.full.staticProperties
 import kotlin.reflect.jvm.isAccessible
@@ -40,9 +33,9 @@ import kotlin.reflect.jvm.isAccessible
 
 @Suppress("unused", "FunctionName", "GrazieInspection", "SpellCheckingInspection")
 object Helpers {
-    private val animList: MutableList<DynamicTexture> = LinkedList<DynamicTexture>()
+    private val animList: MutableList<DynamicTexture> = mutableListOf()
     // private val blockModels: MutableMap<Int?, BaseMod?> = HashMap<Int?, BaseMod?>()
-    private val blockSpecialInv: MutableMap<Int, Boolean> = HashMap()
+    private val blockSpecialInv: MutableMap<Int, Boolean> = mutableMapOf()
     private lateinit var classMap: Map<String, Class<out Entity>>
     /*private var clock = 0L
     const val DEBUG: Boolean = false*/
@@ -53,6 +46,7 @@ object Helpers {
     private var highestEntityId = 3000
     /*private val inGameHooks: MutableMap<BaseMod?, Boolean?> = HashMap<BaseMod?, Boolean?>()
     private val inGUIHooks: MutableMap<BaseMod?, Boolean?> = HashMap<BaseMod?, Boolean?>()*/
+    lateinit var minecraftInstance: Minecraft
     private var itemSpriteIndex = 0
     private var itemSpritesLeft = 0
     /*private val keyList: MutableMap<BaseMod?, MutableMap<KeyBinding?, BooleanArray?>> =
@@ -61,7 +55,7 @@ object Helpers {
     /*private var method_RegisterEntityID: Method? = null
     private var method_RegisterTileEntity: Method? = null
     private var nextBlockModelID = 1000*/
-    private val overrides: MutableMap<Int, MutableMap<String, Int>> = HashMap()
+    private val overrides: MutableMap<Int, MutableMap<String, Int>> = mutableMapOf()
     private lateinit var standardBiomes: Array<Biome>
     private var terrainSpriteIndex = 0
     private var terrainSpritesLeft = 0
@@ -69,6 +63,8 @@ object Helpers {
     private var texturesAdded = false
     private val usedItemSprites = BooleanArray(256)
     private val usedTerrainSprites = BooleanArray(256)
+    @JvmField
+    val smeltables: MutableMap<Int, Int> = mutableMapOf()
 
     /*fun AddAchievementDesc(achievement: AchievementStat, name: String?, description: String?) {
         try {
@@ -214,30 +210,30 @@ object Helpers {
             val i = getUniqueSpriteIndex(fileToOverride)
             addOverride(fileToOverride, fileToAdd, i)
             return i
-        } catch (var3: Throwable) {
-            logger.error("Error in addOverride", var3)
-            ThrowException(var3)
-            throw RuntimeException(var3)
+        } catch (e: Throwable) {
+            logger.error("Error in addOverride", e)
+            ThrowException(e)
+            throw RuntimeException(e)
         }
     }
 
     fun addOverride(path: String, overlayPath: String, index: Int) {
         var left: Int
-        val var6: Byte
+        val atlas: Int
         when (path) {
             "/terrain.png" -> {
-                var6 = 0
+                atlas = 0
                 left = terrainSpritesLeft
             }
             "/gui/items.png" -> {
-                var6 = 1
+                atlas = 1
                 left = itemSpritesLeft
             }
             else -> return
         }
 
         logger.trace("addOverride($path,$overlayPath,$index). $left left.")
-        val overlays = overrides.computeIfAbsent(var6.toInt()) { _: Int -> HashMap() }
+        val overlays: MutableMap<String, Int> = overrides.computeIfAbsent(atlas) { mutableMapOf() }
 
         overlays[overlayPath] = index
     }
@@ -246,19 +242,19 @@ object Helpers {
         CraftingManager.getInstance().registerShaped(output, *params)
     }
 
-    fun AddShapelessRecipe(output: ItemStack, vararg params: Any) {
+    /*fun AddShapelessRecipe(output: ItemStack, vararg params: Any) {
         CraftingManager.getInstance().registerShapeless(output, *params)
-    }
+    }*/
 
     fun AddSmelting(input: Block, output: ItemStack) {
-        SmeltingManager.getInstance().register(input.id, output)
+        smeltables[input.id] = output.id
     }
 
     fun AddSmelting(input: Item, output: ItemStack) {
-        SmeltingManager.getInstance().register(input.id, output)
+        smeltables[input.id] = output.id
     }
 
-    fun AddSpawn(
+    /*fun AddSpawn(
         entityClass: Class<out MobEntity>,
         weightedProb: Int,
         // min: Int,
@@ -305,7 +301,7 @@ object Helpers {
         }
     }
 
-    /*fun DispenseEntity(
+    fun DispenseEntity(
         world: World?,
         x: Double,
         y: Double,
@@ -387,7 +383,7 @@ object Helpers {
             return 0
         }
 
-    fun init() {
+    fun init(minecraft: Minecraft) {
         val usedItemSpritesString =
             "1111111111111111111111111111111111111101111111011111111111111001111111111111111111111111111011111111100110000011111110000000001111111001100000110000000100000011000000010000001100000000000000110000000000000000000000000000000000000000000000001100000000000000"
         val usedTerrainSpritesString =
@@ -405,8 +401,9 @@ object Helpers {
             }
         }
 
+        minecraftInstance = minecraft
+
         try {
-            checkNotNull(Minecraft.INSTANCE)
             // instance!!.gameRenderer = EntityRendererProxy(instance)
             classMap = Entities.KEY_TO_TYPE
             // field_modifiers = Field::class.java.getDeclaredField("modifiers")
@@ -441,42 +438,42 @@ object Helpers {
                 )
             )
             method_RegisterEntityID.setAccessible(true)*/
-        } catch (var10: SecurityException) {
-            logger.error("Error in init", var10)
-            ThrowException(var10)
-            throw RuntimeException(var10)
-        } catch (var10: IllegalAccessException) {
-            logger.error("Error in init", var10)
-            ThrowException(var10)
-            throw RuntimeException(var10)
-        } catch (var10: IllegalArgumentException) {
-            logger.error("Error in init", var10)
-            ThrowException(var10)
-            throw RuntimeException(var10)
-        } catch (var10: NoSuchMethodException) {
-            logger.error("Error in init", var10)
-            ThrowException(var10)
-            throw RuntimeException(var10)
-        } catch (var10: NoSuchFieldException) {
-            logger.error("Error in init", var10)
-            ThrowException(var10)
-            throw RuntimeException(var10)
+        } catch (e: SecurityException) {
+            logger.error("Error in init", e)
+            ThrowException(e)
+            throw RuntimeException(e)
+        } catch (e: IllegalAccessException) {
+            logger.error("Error in init", e)
+            ThrowException(e)
+            throw RuntimeException(e)
+        } catch (e: IllegalArgumentException) {
+            logger.error("Error in init", e)
+            ThrowException(e)
+            throw RuntimeException(e)
+        } catch (e: NoSuchMethodException) {
+            logger.error("Error in init", e)
+            ThrowException(e)
+            throw RuntimeException(e)
+        } catch (e: NoSuchFieldException) {
+            logger.error("Error in init", e)
+            ThrowException(e)
+            throw RuntimeException(e)
         }
 
         try {
             // instance!!.options.keyBindings = RegisterAllKeys(instance!!.options.keyBindings)
             // instance!!.options.load()
             initStats()
-        } catch (var9: Throwable) {
-            logger.error("Error in init", var9)
-            ThrowException("ModLoader has failed to initialize.", var9)
+        } catch (e: Throwable) {
+            logger.error("Error in init", e)
+            ThrowException("ModLoader has failed to initialize.", e)
 
-            throw RuntimeException(var9)
+            throw RuntimeException(e)
         }
     }
 
     private fun initStats() {
-        for (id in Block.BY_ID.indices) {
+        /*for (id in Block.BY_ID.indices) {
             if (Stats.byKey(16777216 + id) != null && Block.BY_ID[id] != null && Block.BY_ID[id].hasStats()) {
                 val str: String = Language.getInstance().translate("stat.mineBlock", Block.BY_ID[id].name)!!
                 val stat = ItemStat(16777216 + id, str, id)
@@ -495,10 +492,10 @@ object Helpers {
                 }
             }
 
-            /*if (Stats.byKey(16973824 + id) != null && Item.BY_ID[id] != null && Item.BY_ID[id].isDamageable) {
+            if (Stats.byKey(16973824 + id) != null && Item.BY_ID[id] != null && Item.BY_ID[id].isDamageable) {
                 val str: String? = Language.getInstance().translate("stat.breakItem", Item.BY_ID[id].displayName)
                 Stats.ITEMS_BROKEN[id] = ItemStat(16973824 + id, str, id).register()
-            }*/
+            }
         }
 
         val idHashSet = HashSet<Int>()
@@ -511,7 +508,7 @@ object Helpers {
             idHashSet.add(result.id)
         }
 
-        /*for (id in idHashSet) {
+        for (id in idHashSet) {
             if (Stats.byKey(16842752 + id!!) != null && Item.BY_ID[id] != null) {
                 val str: String? = Language.getInstance().translate("stat.craftItem", Item.BY_ID[id].displayName)
                 Stats.ITEMS_CRAFTED[id] = ItemStat(16842752 + id, str, id).register()
@@ -520,7 +517,7 @@ object Helpers {
     }
 
     fun isGUIOpen(gui: Class<out Screen>?): Boolean {
-        val game = Minecraft.INSTANCE
+        val game = minecraftInstance
         @Suppress("IfThenToElvis")
         return if (gui == null) {
             game.screen == null
@@ -609,7 +606,7 @@ object Helpers {
     }
 
     fun OpenGUI(player: PlayerEntity, gui: Screen?) {
-        val game = Minecraft.INSTANCE
+        val game = minecraftInstance
         if (game.player === player && gui != null) {
             game.openScreen(gui)
         }
@@ -667,10 +664,10 @@ object Helpers {
                     val im: BufferedImage = loadImage(cache, overlayPath)
                     val anim = ModTextureStatic(index, dst, im)
                     cache.addDynamicTexture(anim)
-                } catch (var11: Exception) {
-                    logger.error("Error in RegisterAllTextureOverrides", var11)
-                    ThrowException(var11)
-                    throw RuntimeException(var11)
+                } catch (e: Exception) {
+                    logger.error("Error in RegisterAllTextureOverrides", e)
+                    ThrowException(e)
+                    throw RuntimeException(e)
                 }
             }
         }
@@ -689,24 +686,24 @@ object Helpers {
             if (Block.BY_ID[id] != null && Item.BY_ID[id] == null) {
                 Item.BY_ID[id] = item
             }
-        } catch (var4: IllegalArgumentException) {
-            logger.error("Error in RegisterBlock", var4)
-            ThrowException(var4)
-        } catch (var4: NoSuchMethodException) {
-            logger.error("Error in RegisterBlock", var4)
-            ThrowException(var4)
-        } catch (var4: InvocationTargetException) {
-            logger.error("Error in RegisterBlock", var4)
-            ThrowException(var4)
-        } catch (var4: InstantiationException) {
-            logger.error("Error in RegisterBlock", var4)
-            ThrowException(var4)
-        } catch (var4: SecurityException) {
-            logger.error("Error in RegisterBlock", var4)
-            ThrowException(var4)
-        } catch (var4: IllegalAccessException) {
-            logger.error("Error in RegisterBlock", var4)
-            ThrowException(var4)
+        } catch (e: IllegalArgumentException) {
+            logger.error("Error in RegisterBlock", e)
+            ThrowException(e)
+        } catch (e: NoSuchMethodException) {
+            logger.error("Error in RegisterBlock", e)
+            ThrowException(e)
+        } catch (e: InvocationTargetException) {
+            logger.error("Error in RegisterBlock", e)
+            ThrowException(e)
+        } catch (e: InstantiationException) {
+            logger.error("Error in RegisterBlock", e)
+            ThrowException(e)
+        } catch (e: SecurityException) {
+            logger.error("Error in RegisterBlock", e)
+            ThrowException(e)
+        } catch (e: IllegalAccessException) {
+            logger.error("Error in RegisterBlock", e)
+            ThrowException(e)
         }
     }
 
@@ -760,7 +757,7 @@ object Helpers {
             logger.error("Error in RegisterTileEntity", var5)
             ThrowException(var5)
         }
-    }*/
+    }
 
     fun RemoveSpawn(entityClass: Class<out MobEntity>, spawnList: MobCategory, vararg biomes: Biome) {
         val fullBiomes: Array<out Biome> = biomes.ifEmpty { standardBiomes }
@@ -777,7 +774,7 @@ object Helpers {
             @Suppress("UNCHECKED_CAST")
             RemoveSpawn(entityClass as Class<out MobEntity>, spawnList, *biomes)
         }
-    }
+    }*/
 
     fun RenderBlockIsItemFull3D(modelID: Int): Boolean {
         return if (!blockSpecialInv.containsKey(modelID)) {
@@ -871,7 +868,7 @@ object Helpers {
 
     @Suppress("unused", "FunctionName")
     fun ThrowException(message: String, e: Throwable) {
-        Minecraft.INSTANCE.handleCrash(CrashReport(message, e))
+        minecraftInstance.handleCrash(CrashReport(message, e))
     }
 
     private fun ThrowException(e: Throwable) {

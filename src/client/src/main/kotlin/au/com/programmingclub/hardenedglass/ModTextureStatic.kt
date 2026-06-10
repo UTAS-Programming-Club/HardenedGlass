@@ -1,6 +1,5 @@
 package au.com.programmingclub.hardenedglass
 
-import net.minecraft.client.Minecraft
 import net.minecraft.client.render.texture.DynamicTexture
 import org.lwjgl.opengl.GL11
 import java.awt.image.BufferedImage
@@ -18,7 +17,7 @@ class ModTextureStatic(slot: Int, size: Int, dst: Int, source: BufferedImage) : 
     init {
         this.replicate = size
         this.atlas = dst
-        this.bind(Minecraft.INSTANCE.textureManager)
+        this.bind(Helpers.minecraftInstance.textureManager)
         val targetWidth = GL11.glGetTexLevelParameteri(GL11.GL_TEXTURE_2D, 0, GL11.GL_TEXTURE_WIDTH) / 16
         val targetHeight = GL11.glGetTexLevelParameteri(GL11.GL_TEXTURE_2D, 0, GL11.GL_TEXTURE_HEIGHT) / 16
         val width = source.width
