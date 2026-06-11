@@ -207,7 +207,7 @@ object Helpers {
             val i = getUniqueSpriteIndex(fileToOverride)
             addOverride(fileToOverride, fileToAdd, i)
             return i
-        } catch (e: Throwable) {
+        } catch (e: Exception) {
             logger.error("Error in addOverride", e)
             ThrowException(e)
             throw RuntimeException(e)
@@ -461,7 +461,7 @@ object Helpers {
             // instance!!.options.keyBindings = RegisterAllKeys(instance!!.options.keyBindings)
             // instance!!.options.load()
             initStats()
-        } catch (e: Throwable) {
+        } catch (e: Exception) {
             logger.error("Error in init", e)
             ThrowException("ModLoader has failed to initialize.", e)
 
@@ -855,11 +855,11 @@ object Helpers {
         }
     }*/
 
-    fun ThrowException(message: String, e: Throwable) {
+    fun ThrowException(message: String, e: Exception) {
         minecraftInstance.handleCrash(CrashReport(message, e))
     }
 
-    private fun ThrowException(e: Throwable) {
+    private fun ThrowException(e: Exception) {
         ThrowException("Exception occurred in ModLoader", e)
     }
 }
