@@ -16,8 +16,7 @@ class ModTextureStatic(slot: Int, size: Int, dst: Int, source: BufferedImage) : 
 
     init {
         this.replicate = size
-        this.atlas = dst
-        this.bind(Helpers.minecraftInstance.textureManager)
+        Helpers.minecraftInstance.textureManager.load("/terrain.png")
         val targetWidth = GL11.glGetTexLevelParameteri(GL11.GL_TEXTURE_2D, 0, GL11.GL_TEXTURE_WIDTH) / 16
         val targetHeight = GL11.glGetTexLevelParameteri(GL11.GL_TEXTURE_2D, 0, GL11.GL_TEXTURE_HEIGHT) / 16
         val width = source.width
