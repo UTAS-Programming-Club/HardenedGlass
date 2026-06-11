@@ -11,12 +11,14 @@ import java.awt.image.BufferedImage
 class ModTextureStatic(slot: Int, size: Int, dst: Int, source: BufferedImage) : DynamicTexture(slot) {
     private var oldAnaglyph = false
     private var buffer: IntArray
+    private val atlas: Int
 
     constructor(slot: Int, dst: Int, source: BufferedImage) : this(slot, 1, dst, source)
 
     init {
         this.replicate = size
-        Helpers.minecraftInstance.textureManager.load("/terrain.png")
+        this.atlas = dst
+        bind()
         val targetWidth = GL11.glGetTexLevelParameteri(GL11.GL_TEXTURE_2D, 0, GL11.GL_TEXTURE_WIDTH) / 16
         val targetHeight = GL11.glGetTexLevelParameteri(GL11.GL_TEXTURE_2D, 0, GL11.GL_TEXTURE_HEIGHT) / 16
         val width = source.width
@@ -62,5 +64,14 @@ class ModTextureStatic(slot: Int, size: Int, dst: Int, source: BufferedImage) : 
         }
 
         this.oldAnaglyph = this.anaglyph
+    }
+
+    private fun bind() {
+        val file: String = if (atlas == 1) {
+            "/gui/items.png"
+        } else {
+            "/terrain.png"
+        }
+        Helpers.minecraftInstance.textureManager.load(file)
     }
 }
