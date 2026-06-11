@@ -1,40 +1,39 @@
 {
-	"schemaVersion": 1,
-	"id": "hardenedglass",
-	"version": "${mod_version}+${minecraft_version}",
-	"name": "Hardened Glass",
-	"description": "A mod to add hardened, blast resistant glass for our server.",
-	"authors": [
-		"Programming Club",
-		"Joshua Wierenga"
-	],
-	"contact": {
-		"homepage": "",
-		"sources": "https://github.com/UTAS-Programming-Club/HardenedGlass"
-	},
-	"license": "",
-	"icon": "assets/hardenedglass/icon.png",
-	"environment": "${environment}",
-	"entrypoints": {
-		"init": [
-			{
-				"value": "au.com.programmingclub.hardenedglass.HardenedGlassInit",
-				"adapter": "kotlin"
-			}
-		]
-	},
-	"mixins": [
-		"hardenedglass.mixins.json"
-	],
-	"accessWidener": "hardenedglass.accesswidener",
-	"depends": {
-		"fabricloader": ">=${loader_version}",
-		"minecraft": "${minecraft_dep_version}",
-		"java": ">=8",
-		"osl-entrypoints": ">=0.4.0",
-		"fabric-language-kotlin": ">=${fabric_kotlin_version}+kotlin.${kotlin_version}"
-	},
-	"suggests": {
-		"another-mod": "*"
-	}
+  "schemaVersion": 1,
+  "id": "hardenedglass",
+  "version": "${mod_version}+${minecraft_version}",
+  "name": "Hardened Glass",
+  "description": "A mod to add hardened, blast resistant glass for our server.",
+  "authors": [
+    "Programming Club",
+    "Joshua Wierenga"
+  ],
+  "contact": {
+    "homepage": "",
+    "sources": "https://github.com/UTAS-Programming-Club/HardenedGlass"
+  },
+  "license": "",
+  "icon": "assets/hardenedglass/icon.png",
+  "environment": "${environment}",
+  "entrypoints": {
+    "init": [
+      {
+        "value": "au.com.programmingclub.hardenedglass.HardenedGlassInit",
+        "adapter": "kotlin"
+      }
+    ]
+  },
+  "mixins": [
+    "hardenedglass.mixins.json"
+  ],
+  "accessWidener": "hardenedglass.accesswidener",
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "minecraft": "${minecraft_dep_version}",
+    "java": ">=8",
+    "fabric-language-kotlin": ">=${fabric_kotlin_version}+kotlin.${kotlin_version}"
+  },
+  "suggests": {
+    "another-mod": "*"
+  }
 }

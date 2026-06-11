@@ -6,7 +6,12 @@ import net.minecraft.block.material.Material
 import net.minecraft.item.ItemStack
 
 class HardenedGlassBlock : GlassBlock {
-    constructor() : super(100, Helpers.addOverride("/terrain.png", "/assets/hardenedglass/textures/block/hardened_glass/hardened_glass.png"), Material.GLASS, false) {
+    constructor() : super(
+        100,
+        Helpers.addOverride("/terrain.png", "/assets/hardenedglass/textures/block/hardened_glass/hardened_glass.png"),
+        Material.GLASS,
+        false
+    ) {
         setStrength(10f)
         setBlastResistance(9f)
         setSounds(GLASS_SOUNDS)

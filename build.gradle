@@ -1,127 +1,127 @@
 plugins {
-	id 'fabric-loom' version '1.17-SNAPSHOT' apply false
-	id 'ploceus' version '1.17-SNAPSHOT' apply false
-	id 'maven-publish'
-	id 'java'
-	id 'org.jetbrains.kotlin.jvm' version "${kotlin_version}"
+    id 'fabric-loom' version '1.17-SNAPSHOT' apply false
+    id 'ploceus' version '1.17-SNAPSHOT' apply false
+    id 'maven-publish'
+    id 'java'
+    id 'org.jetbrains.kotlin.jvm' version "${kotlin_version}"
 }
 
 repositories {
-	mavenCentral()
+    mavenCentral()
 }
 
 def configure(project) {
-	project.apply plugin: 'fabric-loom'
-	project.apply plugin: 'ploceus'
-	project.apply plugin: 'maven-publish'
-	project.apply plugin: 'java'
-	project.apply plugin: 'org.jetbrains.kotlin.jvm'
+    project.apply plugin: 'fabric-loom'
+    project.apply plugin: 'ploceus'
+    project.apply plugin: 'maven-publish'
+    project.apply plugin: 'java'
+    project.apply plugin: 'org.jetbrains.kotlin.jvm'
 
-	project.version = "${mod_version}+mc${project.minecraft_version}"
-	project.maven_group = maven_group
+    project.version = "${mod_version}+mc${project.minecraft_version}"
+    project.maven_group = maven_group
 
-	project.base {
-		archivesName = "${archives_base_name}-${project.environment}"
-	}
+    project.base {
+        archivesName = "${archives_base_name}-${project.environment}"
+    }
 
-	project.repositories {
-		// Add repositories to retrieve artifacts from in here.
-		// You should only use this when depending on other mods because
-		// Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
-		// See https://docs.gradle.org/current/userguide/declaring_repositories.html
-		// for more information about repositories.
-	}
+    project.repositories {
+        // Add repositories to retrieve artifacts from in here.
+        // You should only use this when depending on other mods because
+        // Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
+        // See https://docs.gradle.org/current/userguide/declaring_repositories.html
+        // for more information about repositories.
+    }
 
-	project.loom {
-		accessWidenerPath = file("src/${project.environment}/src/main/resources/hardenedglass.accesswidener")
+    project.loom {
+        accessWidenerPath = file("src/${project.environment}/src/main/resources/hardenedglass.accesswidener")
 
-		if (project.environment == 'client') {
-			clientOnlyMinecraftJar()
-		}
-		if (project.environment == 'server') {
-			serverOnlyMinecraftJar()
-		}
-	}
+        if (project.environment == 'client') {
+            clientOnlyMinecraftJar()
+        }
+        if (project.environment == 'server') {
+            serverOnlyMinecraftJar()
+        }
+    }
 
-	project.ploceus {
-		if (project.environment == 'client') {
-			clientOnlyMappings()
-		}
-		if (project.environment == 'server') {
-			serverOnlyMappings()
-		}
-	}
+    project.ploceus {
+        if (project.environment == 'client') {
+            clientOnlyMappings()
+        }
+        if (project.environment == 'server') {
+            serverOnlyMappings()
+        }
+    }
 
-	project.dependencies {
-		minecraft "com.mojang:minecraft:${project.minecraft_version}"
-		modImplementation "net.fabricmc:fabric-loader:${loader_version}"
+    project.dependencies {
+        minecraft "com.mojang:minecraft:${project.minecraft_version}"
+        modImplementation "net.fabricmc:fabric-loader:${loader_version}"
 
-		exceptions "net.ornithemc:raven:${project.minecraft_version}+build.${project.raven_build}"
-		signatures "net.ornithemc:sparrow:${project.minecraft_version}+build.${project.sparrow_build}"
-		nests "net.ornithemc:nests:${project.minecraft_version}+build.${project.nests_build}"
-		mappings project.ploceus.featherMappings(project.feather_build)
+        exceptions "net.ornithemc:raven:${project.minecraft_version}+build.${project.raven_build}"
+        signatures "net.ornithemc:sparrow:${project.minecraft_version}+build.${project.sparrow_build}"
+        nests "net.ornithemc:nests:${project.minecraft_version}+build.${project.nests_build}"
+        mappings project.ploceus.featherMappings(project.feather_build)
 
-		project.ploceus.dependOsl(osl_version, project.environment)
-		modImplementation "net.fabricmc:fabric-language-kotlin:${fabric_kotlin_version}+kotlin.${kotlin_version}"
-	}
+        project.ploceus.dependOsl(osl_version, project.environment)
+        modImplementation "net.fabricmc:fabric-language-kotlin:${fabric_kotlin_version}+kotlin.${kotlin_version}"
+    }
 
-	project.sourceSets {
-		main {
-			java {
-				srcDirs += project.rootProject.sourceSets.main.java.srcDirs
-			}
-			resources {
-				srcDirs += project.rootProject.sourceSets.main.resources.srcDirs
-			}
-		}
-	}
+    project.sourceSets {
+        main {
+            java {
+                srcDirs += project.rootProject.sourceSets.main.java.srcDirs
+            }
+            resources {
+                srcDirs += project.rootProject.sourceSets.main.resources.srcDirs
+            }
+        }
+    }
 
-	project.processResources {
-		filesMatching('fabric.mod.json') {
-			expand project.properties
-		}
-	}
+    project.processResources {
+        filesMatching('fabric.mod.json') {
+            expand project.properties
+        }
+    }
 
-	project.tasks.withType(JavaCompile).configureEach {
-		it.options.encoding = 'UTF-8'
-		it.options.release = 8
-	}
+    project.tasks.withType(JavaCompile).configureEach {
+        it.options.encoding = 'UTF-8'
+        it.options.release = 8
+    }
 
-	project.tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
-		it.kotlinOptions.jvmTarget = 1.8
-	}
+    project.tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
+        it.kotlinOptions.jvmTarget = 1.8
+    }
 
-	project.java {
-		// Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task if it is present.
-		// If you remove this line, sources will not be generated.
-		withSourcesJar()
+    project.java {
+        // Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task if it is present.
+        // If you remove this line, sources will not be generated.
+        withSourcesJar()
 
-		// Still required by IDEs such as Eclipse and Visual Studio Code
-		sourceCompatibility = JavaVersion.VERSION_1_8
-		targetCompatibility = JavaVersion.VERSION_1_8
-	}
+        // Still required by IDEs such as Eclipse and Visual Studio Code
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+    }
 
-	// If you plan to use a different file for the license, don't forget to change the file name here!
-	project.jar {
-		from('LICENSE') {
-			rename { "${it}_${project.base.archivesName.get()}" }
-		}
-	}
+    // If you plan to use a different file for the license, don't forget to change the file name here!
+    project.jar {
+        from('LICENSE') {
+            rename { "${it}_${project.base.archivesName.get()}" }
+        }
+    }
 
-	// Configure the maven publication
-	project.publishing {
-		publications {
-			mavenJava(MavenPublication) {
-				from project.components.java
-			}
-		}
+    // Configure the maven publication
+    project.publishing {
+        publications {
+            mavenJava(MavenPublication) {
+                from project.components.java
+            }
+        }
 
-		// See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
-		repositories {
-			// Add repositories to publish to here.
-			// Notice: This block does NOT have the same function as the block in the top level.
-			// The repositories here will be used for publishing your artifact, not for
-			// retrieving dependencies.
-		}
-	}
+        // See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
+        repositories {
+            // Add repositories to publish to here.
+            // Notice: This block does NOT have the same function as the block in the top level.
+            // The repositories here will be used for publishing your artifact, not for
+            // retrieving dependencies.
+        }
+    }
 }

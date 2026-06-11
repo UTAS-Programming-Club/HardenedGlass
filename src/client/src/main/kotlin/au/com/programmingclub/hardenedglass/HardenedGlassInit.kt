@@ -1,17 +1,14 @@
 package au.com.programmingclub.hardenedglass
 
-import net.ornithemc.osl.entrypoints.api.ModInitializer
-import net.ornithemc.osl.lifecycle.api.MinecraftEvents
+import net.minecraft.client.Minecraft
 
-class HardenedGlassInit : ModInitializer {
-    override fun init() {
-        MinecraftEvents.READY.register {
-            Helpers.init(it)
-            HardenedGlass.onReady()
-        }
+object HardenedGlassInit {
+    fun init(minecraft: Minecraft) {
+        Helpers.init(minecraft)
+        HardenedGlass.onReady()
+    }
 
-        MinecraftEvents.TICK_START.register {
-            Helpers.OnTick(0.0f, it)
-        }
+    fun tick(minecraft: Minecraft) {
+        Helpers.OnTick(0.0f, minecraft)
     }
 }

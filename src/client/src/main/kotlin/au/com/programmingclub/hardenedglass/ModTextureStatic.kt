@@ -67,10 +67,9 @@ class ModTextureStatic(slot: Int, size: Int, dst: Int, source: BufferedImage) : 
     }
 
     private fun bind() {
-        val file: String = if (atlas == 1) {
-            "/gui/items.png"
-        } else {
-            "/terrain.png"
+        val file: String = when (atlas == 1) {
+            true -> "/gui/items.png"
+            false -> "/terrain.png"
         }
         Helpers.minecraftInstance.textureManager.load(file)
     }
