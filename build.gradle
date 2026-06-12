@@ -56,8 +56,8 @@ def configure(project) {
         minecraft "com.mojang:minecraft:${project.minecraft_version}"
         modImplementation "net.fabricmc:fabric-loader:${loader_version}"
 
-        exceptions "net.ornithemc:raven:${project.minecraft_version}+build.${project.raven_build}"
-        signatures "net.ornithemc:sparrow:${project.minecraft_version}+build.${project.sparrow_build}"
+        // exceptions "net.ornithemc:raven:${project.minecraft_version}+build.${project.raven_build}"
+        // signatures "net.ornithemc:sparrow:${project.minecraft_version}+build.${project.sparrow_build}"
         nests "net.ornithemc:nests:${project.minecraft_version}+build.${project.nests_build}"
         mappings project.ploceus.featherMappings(project.feather_build)
 

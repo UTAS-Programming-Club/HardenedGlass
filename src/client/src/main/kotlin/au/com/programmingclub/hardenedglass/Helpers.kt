@@ -3,19 +3,17 @@ package au.com.programmingclub.hardenedglass
 import net.fabricmc.loader.api.FabricLoader
 import net.fabricmc.loader.api.ModContainer
 import net.minecraft.block.Block
+import net.minecraft.client.CrashException
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screen.Screen
 import net.minecraft.client.render.entity.PlayerRenderer
 import net.minecraft.client.render.texture.DynamicTexture
 import net.minecraft.client.render.texture.TextureManager
 import net.minecraft.crafting.CraftingManager
-import net.minecraft.entity.Entities
-import net.minecraft.entity.Entity
 import net.minecraft.entity.mob.player.PlayerEntity
 import net.minecraft.item.BlockItem
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
-import net.minecraft.util.crash.CrashReport
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 import java.awt.image.BufferedImage
@@ -33,7 +31,7 @@ object Helpers {
     private val animList: MutableList<DynamicTexture> = mutableListOf()
     // private val blockModels: MutableMap<Int?, BaseMod?> = HashMap<Int?, BaseMod?>()
     private val blockSpecialInv: MutableMap<Int, Boolean> = mutableMapOf()
-    private lateinit var classMap: Map<String, Class<out Entity>>
+    // private lateinit var classMap: Map<String, Class<out Entity>>
     /*private var clock = 0L
     const val DEBUG: Boolean = false*/
     // private var field_animList: Field? = null
@@ -402,7 +400,7 @@ object Helpers {
 
         try {
             // instance!!.gameRenderer = EntityRendererProxy(instance)
-            classMap = Entities.KEY_TO_TYPE
+            // classMap = Entities.KEY_TO_TYPE
             // field_modifiers = Field::class.java.getDeclaredField("modifiers")
             // field_modifiers!!.setAccessible(true)
             // field_TileEntityRenderers = BlockEntityRenderDispatcher::class.java.getDeclaredFields()[0]
@@ -856,7 +854,7 @@ object Helpers {
     }*/
 
     fun ThrowException(message: String, e: Exception) {
-        minecraftInstance.handleCrash(CrashReport(message, e))
+        minecraftInstance.handleCrash(CrashException(message, e))
     }
 
     private fun ThrowException(e: Exception) {
