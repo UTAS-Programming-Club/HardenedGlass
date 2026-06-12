@@ -3,7 +3,6 @@ package au.com.programmingclub.hardenedglass
 import net.fabricmc.loader.api.FabricLoader
 import net.fabricmc.loader.api.ModContainer
 import net.minecraft.block.Block
-import net.minecraft.client.CrashException
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screen.Screen
 import net.minecraft.client.render.entity.PlayerRenderer
@@ -854,7 +853,8 @@ object Helpers {
     }*/
 
     fun ThrowException(message: String, e: Exception) {
-        minecraftInstance.handleCrash(CrashException(message, e))
+        // minecraftInstance.handleCrash(CrashException(message, e))
+        throw e
     }
 
     private fun ThrowException(e: Exception) {
