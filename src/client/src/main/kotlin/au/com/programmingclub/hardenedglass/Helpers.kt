@@ -861,3 +861,7 @@ object Helpers {
         ThrowException("Exception occurred in ModLoader", e)
     }
 }
+
+fun Block.setSounds(sounds: Block.Sounds) {
+    this.sounds = sounds
+}
