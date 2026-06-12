@@ -16,7 +16,7 @@ class ModTextureStatic(slot: Int, size: Int, dst: Int, source: BufferedImage) : 
     constructor(slot: Int, dst: Int, source: BufferedImage) : this(slot, 1, dst, source)
 
     init {
-        this.replicate = size
+        this.copyTo = size
         this.atlas = dst
         bind()
         val targetWidth = GL11.glGetTexLevelParameteri(GL11.GL_TEXTURE_2D, 0, GL11.GL_TEXTURE_WIDTH) / 16
