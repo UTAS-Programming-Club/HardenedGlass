@@ -4,10 +4,9 @@ import net.minecraft.client.model.*
 import net.minecraft.client.render.VertexConsumer
 import net.minecraft.client.render.entity.EntityRendererFactory
 import net.minecraft.client.render.entity.MobEntityRenderer
-import net.minecraft.client.render.entity.PigEntityRenderer
 import net.minecraft.client.render.entity.model.EntityModel
+import net.minecraft.client.render.entity.model.PigEntityModel
 import net.minecraft.client.util.math.MatrixStack
-import net.minecraft.entity.passive.PigEntity
 import net.minecraft.util.Identifier
 
 // CONVERTED FROM BLOCK BENCH MODEL EXPORT USING JAVAINUSE

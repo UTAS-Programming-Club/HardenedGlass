@@ -2,6 +2,7 @@ package au.com.programmingclub.hardenedglass
 
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents
 import net.fabricmc.fabric.api.`object`.builder.v1.entity.FabricDefaultAttributeRegistry
+import net.minecraft.entity.AnimationState
 import net.minecraft.entity.EntityType
 import net.minecraft.entity.SpawnGroup
 import net.minecraft.entity.attribute.DefaultAttributeContainer
@@ -12,6 +13,7 @@ import net.minecraft.item.*
 import net.minecraft.registry.Registries
 import net.minecraft.registry.Registry
 import net.minecraft.util.Identifier
+import net.minecraft.util.math.Vec3d
 import net.minecraft.world.World
 
 // --------------- Test Entity ---------------
@@ -52,6 +54,31 @@ class BaseTallPigEntity(entityType: EntityType<out PigEntity?>, world: World) : 
                 .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, .3)
                 .add(EntityAttributes.GENERIC_JUMP_STRENGTH, .7)
                 .add(EntityAttributes.GENERIC_SCALE, 1.0)
+        }
+    }
+
+    val idleAnimState = AnimationState()
+    val walkAnimState = AnimationState()
+
+    override fun tick() {
+        super.tick()
+        if(this.world.isClient){
+            setAnimStates()
+        }
+    }
+
+    private fun setAnimStates(){
+        System.out.println("Walk anim:")
+        System.out.println(walkAnimState.isRunning)
+        System.out.println("Idle anim:")
+        System.out.println(idleAnimState.isRunning)
+
+        if (this.velocity.lengthSquared() < 0.0001) {
+            walkAnimState.stop()
+            idleAnimState.start(this.age)
+        }else{
+            idleAnimState.stop()
+            walkAnimState.start(this.age)
         }
     }
 }

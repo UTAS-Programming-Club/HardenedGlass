@@ -11,10 +11,12 @@ import net.minecraft.client.render.VertexConsumer
 import net.minecraft.client.render.entity.EntityRendererFactory
 import net.minecraft.client.render.entity.MobEntityRenderer
 import net.minecraft.client.render.entity.model.EntityModel
+import net.minecraft.client.render.entity.model.SinglePartEntityModel
 import net.minecraft.client.util.math.MatrixStack
 import net.minecraft.util.Identifier
+import net.minecraft.util.math.MathHelper
 
-class TallPigEntityModel(val modelPart : ModelPart) : EntityModel<BaseTallPigEntity>() {
+class TallPigEntityModel(val modelPart : ModelPart) : SinglePartEntityModel<BaseTallPigEntity>() {
 
     companion object {
         fun getTexturedModelData(): TexturedModelData {
@@ -86,6 +88,10 @@ class TallPigEntityModel(val modelPart : ModelPart) : EntityModel<BaseTallPigEnt
         leg4.render(matrices, vertices, light, overlay, red, green, blue, alpha)
     }
 
+    override fun getPart(): ModelPart? {
+        return modelPart.getChild("body")
+    }
+
     override fun setAngles(
         entity: BaseTallPigEntity?,
         limbAngle: Float,
@@ -94,6 +100,17 @@ class TallPigEntityModel(val modelPart : ModelPart) : EntityModel<BaseTallPigEnt
         headYaw: Float,
         headPitch: Float
     ) {
+        modelPart.traverse().forEach { modelPart -> modelPart.resetTransform() }
+
+        this.animateMovement(
+            walk_tall_pig,
+            limbAngle,
+            limbDistance,
+            animationProgress,
+            2.5f
+        )
+
+        this.updateAnimation(entity?.idleAnimState, idle_tall_pig, animationProgress, 1f)
     }
 }
 
