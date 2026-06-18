@@ -1,6 +1,7 @@
 {
   "block.hardenedglass.hardened_glass": "Hardened Glass",
-  "item.hardenedglass.long_pig_entity_spawn_egg": "Long Pig Spawn Egg",
+  "item.hardenedglass.long_pig_spawn_egg": "Long Pig Spawn Egg",
+  "item.hardenedglass.tall_pig_spawn_egg": "Tall Pig Spawn Egg",
   "item.hardenedglass.long_bacon": "Long Bacon",
   "item.hardenedglass.raw_long_bacon": "Raw Long Bacon",
   "item.hardenedglass.tall_bacon": "Tall Bacon",
