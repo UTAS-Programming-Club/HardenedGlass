@@ -7,9 +7,9 @@ import net.minecraft.block.TransparentBlock
 import net.minecraft.item.BlockItem
 import net.minecraft.item.Item
 import net.minecraft.item.ItemGroups
-import net.minecraft.util.Identifier
 import net.minecraft.registry.Registries
 import net.minecraft.registry.Registry
+import net.minecraft.util.Identifier
 
 private val HardenedGlassIdentifier = Identifier(namespace, "hardened_glass")
 val HardenedGlassBlock = TransparentBlock(
@@ -23,7 +23,7 @@ fun registerHardenedGlassBlock() {
     Registry.register(Registries.BLOCK, HardenedGlassIdentifier, HardenedGlassBlock)
     Registry.register(Registries.ITEM, HardenedGlassIdentifier, HardenedGlassItem)
 
-    ItemGroupEvents.modifyEntriesEvent(ItemGroups.COLORED_BLOCKS).register({content ->
+    ItemGroupEvents.modifyEntriesEvent(ItemGroups.COLORED_BLOCKS).register { content ->
         content.add(HardenedGlassItem)
-    })
+    }
 }
