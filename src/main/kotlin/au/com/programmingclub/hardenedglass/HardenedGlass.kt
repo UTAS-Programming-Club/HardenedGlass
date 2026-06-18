@@ -1,7 +1,6 @@
 package au.com.programmingclub.hardenedglass
 
-import au.com.programmingclub.hardenedglass.entity.registerPigEntity
-import au.com.programmingclub.hardenedglass.entity.registerTallPigEntity
+import au.com.programmingclub.hardenedglass.entity.HardenedGlassEntities
 import net.fabricmc.api.ModInitializer
 
 const val namespace = "hardenedglass"
@@ -13,7 +12,6 @@ object HardenedGlass : ModInitializer {
     // Proceed with mild caution.
     registerBaconItems()
     registerHardenedGlassBlock()
-    registerPigEntity()
-    registerTallPigEntity()
+    HardenedGlassEntities.registerEntities()
   }
 }
