@@ -20,38 +20,35 @@ val LongPigEntityIdentifier = Identifier(namespace, "long_pig_entity")
 val LongPigEntitySpawnEggIdentifier = Identifier(namespace, "long_pig_entity_spawn_egg")
 
 val LongPigEntity: EntityType<BaseLongPigEntity> = Registry.register(
-  Registries.ENTITY_TYPE,
-  LongPigEntityIdentifier,
-  EntityType.Builder.create( { entityType: EntityType<BaseLongPigEntity>, world: World ->
-    BaseLongPigEntity(
-      entityType,
-      world
-    )
-  }, SpawnGroup.CREATURE).dimensions(0.75f, 0.75f).build("long_pig_entity")
+    Registries.ENTITY_TYPE,
+    LongPigEntityIdentifier,
+    EntityType.Builder.create({ entityType: EntityType<BaseLongPigEntity>, world: World ->
+        BaseLongPigEntity(
+            entityType,
+            world
+        )
+    }, SpawnGroup.CREATURE).dimensions(1.5f, 0.75f).build("long_pig_entity")
 )
 
 fun registerPigEntity() {
     // --------------- Test Entity ---------------
     val LONG_PIG_ENTITY_SPAWN_EGG: Item =
-      SpawnEggItem(LongPigEntity, 0xc4c4c4, 0xadadad, Item.Settings())
+        SpawnEggItem(LongPigEntity, 0xc4c4c4, 0xadadad, Item.Settings())
     Registry.register(Registries.ITEM, LongPigEntitySpawnEggIdentifier, LONG_PIG_ENTITY_SPAWN_EGG)
 
     FabricDefaultAttributeRegistry.register(LongPigEntity, BaseLongPigEntity.createMobAttribute())
 
-    ItemGroupEvents.modifyEntriesEvent(ItemGroups.SPAWN_EGGS).register({content ->
-      content.add(LONG_PIG_ENTITY_SPAWN_EGG)
+    ItemGroupEvents.modifyEntriesEvent(ItemGroups.SPAWN_EGGS).register({ content ->
+        content.add(LONG_PIG_ENTITY_SPAWN_EGG)
     })
 }
 
 // --------------- Test Entity ---------------
 class BaseLongPigEntity(entityType: EntityType<out PigEntity?>, world: World) : PigEntity(entityType, world) {
-  companion object {
-    fun createMobAttribute(): DefaultAttributeContainer.Builder {
-      return MobEntity.createMobAttributes()
-        .add(EntityAttributes.GENERIC_MAX_HEALTH, 15.0)
-        .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, .3)
-        .add(EntityAttributes.GENERIC_JUMP_STRENGTH, .7)
-        .add(EntityAttributes.GENERIC_SCALE, 1.0)
+    companion object {
+        fun createMobAttribute(): DefaultAttributeContainer.Builder {
+            return createPigAttributes()
+                .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, .3)
+        }
     }
-  }
 }
