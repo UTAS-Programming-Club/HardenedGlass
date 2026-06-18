@@ -1,5 +1,7 @@
 package au.com.programmingclub.hardenedglass
 
+import au.com.programmingclub.hardenedglass.entity.registerPigEntity
+import au.com.programmingclub.hardenedglass.entity.registerTallPigEntity
 import net.fabricmc.api.ModInitializer
 
 const val namespace = "hardenedglass"

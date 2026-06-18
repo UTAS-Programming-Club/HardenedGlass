@@ -1,20 +1,20 @@
-package au.com.programmingclub.hardenedglass
+package au.com.programmingclub.hardenedglass.entity
 
-import net.minecraft.client.model.*
-import net.minecraft.client.render.VertexConsumer
+import au.com.programmingclub.hardenedglass.namespace
+import net.minecraft.client.model.Dilation
+import net.minecraft.client.model.ModelData
+import net.minecraft.client.model.ModelPart
+import net.minecraft.client.model.ModelPartBuilder
+import net.minecraft.client.model.ModelTransform
+import net.minecraft.client.model.TexturedModelData
 import net.minecraft.client.render.entity.EntityRendererFactory
 import net.minecraft.client.render.entity.MobEntityRenderer
-import net.minecraft.client.render.entity.model.EntityModel
 import net.minecraft.client.render.entity.model.EntityModelPartNames
-import net.minecraft.client.render.entity.model.PigEntityModel
 import net.minecraft.client.render.entity.model.QuadrupedEntityModel
-import net.minecraft.client.util.math.MatrixStack
 import net.minecraft.util.Identifier
 
-// CONVERTED FROM BLOCK BENCH MODEL EXPORT USING JAVAINUSE
 class LongPigEntityModel(root: ModelPart) :
-    QuadrupedEntityModel<BaseLongPigEntity>(root, false, 4.0F, 4.0F, 2.0F, 2.0F, 24) {
-
+    QuadrupedEntityModel<LongPigEntity>(root, false, 4.0F, 4.0F, 2.0F, 2.0F, 24) {
     companion object {
         fun getTexturedModelData(): TexturedModelData {
             val modelData = ModelData()
@@ -62,12 +62,12 @@ class LongPigEntityModel(root: ModelPart) :
 }
 
 class LongPigEntityRenderer(context: EntityRendererFactory.Context) :
-    MobEntityRenderer<BaseLongPigEntity, LongPigEntityModel>(
+    MobEntityRenderer<LongPigEntity, LongPigEntityModel>(
         context,
-        LongPigEntityModel(context.getPart(HardenedGlassClient.MODEL_LONG_PIG_LAYER)),
+        LongPigEntityModel(context.getPart(HardenedGlassModelLayers.LONG_PIG)),
         0.5f
     ) {
-    override fun getTexture(entity: BaseLongPigEntity?): Identifier? {
+    override fun getTexture(entity: LongPigEntity): Identifier? {
         return Identifier.of(namespace, "textures/entity/long_pig/long_pig.png")
     }
 }

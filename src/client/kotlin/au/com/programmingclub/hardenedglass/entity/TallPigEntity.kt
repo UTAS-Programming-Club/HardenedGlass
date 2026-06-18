@@ -1,19 +1,24 @@
-package au.com.programmingclub.hardenedglass
+package au.com.programmingclub.hardenedglass.entity
 
-import net.minecraft.client.model.*
+import au.com.programmingclub.hardenedglass.namespace
+import net.minecraft.client.model.Dilation
+import net.minecraft.client.model.ModelData
+import net.minecraft.client.model.ModelPart
+import net.minecraft.client.model.ModelPartBuilder
+import net.minecraft.client.model.ModelTransform
+import net.minecraft.client.model.TexturedModelData
 import net.minecraft.client.render.entity.EntityRendererFactory
 import net.minecraft.client.render.entity.MobEntityRenderer
 import net.minecraft.client.render.entity.model.EntityModelPartNames
 import net.minecraft.client.render.entity.model.QuadrupedEntityModel
 import net.minecraft.util.Identifier
 
-
-class TallPigEntityModel(root : ModelPart) : QuadrupedEntityModel<BaseTallPigEntity>(root,false, 4.0F, 4.0F, 2.0F, 2.0F, 24) {
-
+class TallPigEntityModel(root: ModelPart) :
+    QuadrupedEntityModel<TallPigEntity>(root, false, 4.0F, 4.0F, 2.0F, 2.0F, 24) {
     companion object {
         fun getTexturedModelData(): TexturedModelData {
             val modelData = ModelData()
-            val modelPartData = modelData.getRoot()
+            val modelPartData = modelData.root
 
             modelPartData.addChild(
                 EntityModelPartNames.HEAD,
@@ -57,12 +62,13 @@ class TallPigEntityModel(root : ModelPart) : QuadrupedEntityModel<BaseTallPigEnt
 
 }
 
-class TallPigEntityRenderer(context: EntityRendererFactory.Context) : MobEntityRenderer<BaseTallPigEntity, TallPigEntityModel>(
-    context,
-    TallPigEntityModel(context.getPart(HardenedGlassClient.MODEL_TALL_PIG_LAYER)),
-    0.5f
-) {
-    override fun getTexture(entity: BaseTallPigEntity?): Identifier? {
+class TallPigEntityRenderer(context: EntityRendererFactory.Context) :
+    MobEntityRenderer<TallPigEntity, TallPigEntityModel>(
+        context,
+        TallPigEntityModel(context.getPart(HardenedGlassModelLayers.TALL_PIG)),
+        0.5f
+    ) {
+    override fun getTexture(entity: TallPigEntity): Identifier? {
         return Identifier.of(namespace, "textures/entity/tall_pig/tall_pig.png")
     }
 }
