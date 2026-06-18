@@ -24,12 +24,12 @@ val TallPigEntitySpawnEggIdentifier = Identifier(namespace, "tall_pig_entity_spa
 val TallPigEntity: EntityType<BaseTallPigEntity> = Registry.register(
     Registries.ENTITY_TYPE,
     TallPigEntityIdentifier,
-    EntityType.Builder.create( { entityType: EntityType<BaseTallPigEntity>, world: World ->
+    EntityType.Builder.create({ entityType: EntityType<BaseTallPigEntity>, world: World ->
         BaseTallPigEntity(
             entityType,
             world
         )
-    }, SpawnGroup.CREATURE).dimensions(0.75f, 0.75f).build("tall_pig_entity")
+    }, SpawnGroup.CREATURE).dimensions(0.75f, 1.4f).build("tall_pig_entity")
 )
 
 fun registerTallPigEntity() {
@@ -40,7 +40,7 @@ fun registerTallPigEntity() {
 
     FabricDefaultAttributeRegistry.register(TallPigEntity, BaseTallPigEntity.createMobAttribute())
 
-    ItemGroupEvents.modifyEntriesEvent(ItemGroups.SPAWN_EGGS).register({content ->
+    ItemGroupEvents.modifyEntriesEvent(ItemGroups.SPAWN_EGGS).register({ content ->
         content.add(TALL_PIG_ENTITY_SPAWN_EGG)
     })
 }
@@ -49,36 +49,8 @@ fun registerTallPigEntity() {
 class BaseTallPigEntity(entityType: EntityType<out PigEntity?>, world: World) : PigEntity(entityType, world) {
     companion object {
         fun createMobAttribute(): DefaultAttributeContainer.Builder {
-            return MobEntity.createMobAttributes()
-                .add(EntityAttributes.GENERIC_MAX_HEALTH, 15.0)
-                .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, .3)
+            return createPigAttributes()
                 .add(EntityAttributes.GENERIC_JUMP_STRENGTH, .7)
-                .add(EntityAttributes.GENERIC_SCALE, 1.0)
-        }
-    }
-
-    val idleAnimState = AnimationState()
-    val walkAnimState = AnimationState()
-
-    override fun tick() {
-        super.tick()
-        if(this.world.isClient){
-            setAnimStates()
-        }
-    }
-
-    private fun setAnimStates(){
-        System.out.println("Walk anim:")
-        System.out.println(walkAnimState.isRunning)
-        System.out.println("Idle anim:")
-        System.out.println(idleAnimState.isRunning)
-
-        if (this.velocity.lengthSquared() < 0.0001) {
-            walkAnimState.stop()
-            idleAnimState.start(this.age)
-        }else{
-            idleAnimState.stop()
-            walkAnimState.start(this.age)
         }
     }
 }
