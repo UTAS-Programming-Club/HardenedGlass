@@ -6,12 +6,14 @@ import net.fabricmc.fabric.api.`object`.builder.v1.entity.FabricDefaultAttribute
 import net.minecraft.entity.EntityType
 import net.minecraft.entity.attribute.DefaultAttributeContainer
 import net.minecraft.entity.attribute.EntityAttributes
+import net.minecraft.entity.passive.PassiveEntity
 import net.minecraft.entity.passive.PigEntity
 import net.minecraft.item.Item
 import net.minecraft.item.ItemGroups
 import net.minecraft.item.SpawnEggItem
 import net.minecraft.registry.Registries
 import net.minecraft.registry.Registry
+import net.minecraft.server.world.ServerWorld
 import net.minecraft.util.Identifier
 import net.minecraft.world.World
 
@@ -36,5 +38,9 @@ class TallPigEntity(entityType: EntityType<TallPigEntity>, world: World) : PigEn
         fun createMobAttribute(): DefaultAttributeContainer.Builder {
             return createPigAttributes().add(EntityAttributes.GENERIC_JUMP_STRENGTH, .7)
         }
+    }
+
+    override fun createChild(serverWorld: ServerWorld, passiveEntity: PassiveEntity): TallPigEntity? {
+        return HardenedGlassEntities.TALL_PIG.create(serverWorld)
     }
 }
