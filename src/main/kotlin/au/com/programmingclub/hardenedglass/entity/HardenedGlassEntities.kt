@@ -4,7 +4,6 @@ import au.com.programmingclub.hardenedglass.namespace
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents
 import net.fabricmc.fabric.api.`object`.builder.v1.entity.FabricDefaultAttributeRegistry
 import net.minecraft.entity.EntityType
-import net.minecraft.entity.SpawnGroup
 import net.minecraft.item.Item
 import net.minecraft.item.ItemGroups
 import net.minecraft.item.SpawnEggItem
@@ -15,19 +14,37 @@ import net.minecraft.util.Identifier
 object HardenedGlassEntities {
     val LONG_PIG_ID = Identifier(namespace, "long_pig")
     private val LONG_PIG_SPAWN_EGG_ID = Identifier(namespace, "long_pig_spawn_egg")
-    val LONG_PIG: EntityType<LongPigEntity> = Registry.register(
-        Registries.ENTITY_TYPE,
-        LONG_PIG_ID,
-        EntityType.Builder.create(::LongPigEntity, SpawnGroup.CREATURE).dimensions(1.5f, 0.75f).build()
-    )
+    val LONG_PIG: EntityType<LongPigEntity> =
+        Registry.register(Registries.ENTITY_TYPE, LONG_PIG_ID, getLongPigEntityBuilder())
+    private fun getLongPigEntityBuilder(): EntityType<LongPigEntity> {
+        val pig = EntityType.PIG
+        val pigDimensions = pig.dimensions
+
+        val entityBuilder = EntityType.Builder<LongPigEntity>.create(::LongPigEntity, pig.spawnGroup)
+        entityBuilder.dimensions(2 * pigDimensions.width(), pigDimensions.height())
+        // EntityType.PIG also calls passengerAttachments but not including this appears better for tall pig so doing the same here for consistency
+        // Skipping it appears to have no impact on rider position
+        entityBuilder.maxTrackingRange(pig.maxTrackDistance)
+        return entityBuilder.build()
+    }
+
 
     val TALL_PIG_ID = Identifier(namespace, "tall_pig")
     private val TALL_PIG_SPAWN_EGG_ID = Identifier(namespace, "tall_pig_spawn_egg")
-    val TALL_PIG: EntityType<TallPigEntity> = Registry.register(
-        Registries.ENTITY_TYPE,
-        TALL_PIG_ID,
-        EntityType.Builder.create(::TallPigEntity, SpawnGroup.CREATURE).dimensions(0.75f, 1.4f).build()
-    )
+    val TALL_PIG: EntityType<TallPigEntity> =
+        Registry.register(Registries.ENTITY_TYPE, TALL_PIG_ID, getCamTallPigEntity())
+    private fun getCamTallPigEntity(): EntityType<TallPigEntity> {
+        val pig = EntityType.PIG
+        val pigDimensions = pig.dimensions
+
+        val entityBuilder = EntityType.Builder<TallPigEntity>.create(::TallPigEntity, pig.spawnGroup)
+        // TODO: Make sure 5/3 is the correct factor
+        entityBuilder.dimensions(pigDimensions.width(), 5f / 3f * pigDimensions.height())
+        // EntityType.PIG also calls passengerAttachments but doing so here would require calculating the new rider height by hand
+        // Skipping it however appears to cause it to be determined automatically
+        entityBuilder.maxTrackingRange(pig.maxTrackDistance)
+        return entityBuilder.build()
+    }
 
     fun registerEntities() {
         val longPigSpawnEgg: Item = SpawnEggItem(LONG_PIG, 0xc4c4c4, 0xadadad, Item.Settings())
