@@ -17,6 +17,7 @@ object HardenedGlassEntities {
     val LONG_PIG: EntityType<LongPigEntity> =
         Registry.register(Registries.ENTITY_TYPE, LONG_PIG_ID, getLongPigEntityBuilder())
 
+    // TODO: Add additional difference to vanilla pig?
     private fun getLongPigEntityBuilder(): EntityType<LongPigEntity> {
         val pig = EntityType.PIG
         val pigDimensions = pig.dimensions
@@ -35,6 +36,7 @@ object HardenedGlassEntities {
     val TALL_PIG: EntityType<TallPigEntity> =
         Registry.register(Registries.ENTITY_TYPE, TALL_PIG_ID, getCamTallPigEntity())
 
+    // TODO: Add additional difference to vanilla pig?
     private fun getCamTallPigEntity(): EntityType<TallPigEntity> {
         val pig = EntityType.PIG
         val pigDimensions = pig.dimensions
@@ -50,6 +52,7 @@ object HardenedGlassEntities {
 
 
     fun registerEntities() {
+        // TODO: Change these colours?
         val longPigSpawnEgg: Item = SpawnEggItem(LONG_PIG, 0xc4c4c4, 0xadadad, Item.Settings())
         val tallPigSpawnEgg: Item = SpawnEggItem(TALL_PIG, 0xc4c4c4, 0xadadad, Item.Settings())
 

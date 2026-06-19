@@ -16,6 +16,7 @@ import net.minecraft.client.render.entity.model.QuadrupedEntityModel
 import net.minecraft.util.Identifier
 
 class LongPigEntityModel(root: ModelPart) :
+    // TODO: Fix child head scale and position
     QuadrupedEntityModel<LongPigEntity>(root, false, 4.0F, 4.0F, 2.0F, 2.0F, 24) {
     companion object {
         fun getTexturedModelData(): TexturedModelData {
@@ -72,6 +73,7 @@ class LongPigEntityRenderer :
     constructor(context: EntityRendererFactory.Context) : super(
         context,
         LongPigEntityModel(context.getPart(HardenedGlassModelLayers.LONG_PIG)),
+        // Figure out this parameter
         0.5f
     ) {
         this.addFeature(
