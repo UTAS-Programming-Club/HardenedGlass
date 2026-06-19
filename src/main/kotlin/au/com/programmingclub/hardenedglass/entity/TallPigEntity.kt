@@ -9,8 +9,10 @@ import net.minecraft.server.world.ServerWorld
 import net.minecraft.world.World
 
 // --------------- Test Entity ---------------
+// TODO: Change objectives or breeding foods?
 class TallPigEntity(entityType: EntityType<TallPigEntity>, world: World) : PigEntity(entityType, world) {
     companion object {
+        // TODO: Add additional difference to vanilla pig?
         fun createMobAttribute(): DefaultAttributeContainer.Builder {
             return createPigAttributes().add(EntityAttributes.GENERIC_JUMP_STRENGTH, .7)
         }

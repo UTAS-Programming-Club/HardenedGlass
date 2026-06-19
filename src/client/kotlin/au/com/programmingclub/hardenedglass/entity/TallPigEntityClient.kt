@@ -15,12 +15,14 @@ import net.minecraft.client.render.entity.model.QuadrupedEntityModel
 import net.minecraft.util.Identifier
 
 class TallPigEntityModel(root: ModelPart) :
+    // TODO: Fix child head scale and position
     QuadrupedEntityModel<TallPigEntity>(root, false, 4.0F, 4.0F, 2.0F, 2.0F, 24) {
     companion object {
         private fun getTexturedModelData(dilation: Dilation): TexturedModelData {
             val modelData = ModelData()
             val modelPartData = modelData.root
 
+            // Fix head angle when looking at player with food
             modelPartData.addChild(
                 EntityModelPartNames.HEAD,
                 ModelPartBuilder.create().uv(0, 0).cuboid(-4.0f, -13.0f, -8.0f, 8.0f, 8.0f, 8.0f, dilation)
@@ -79,6 +81,7 @@ class TallPigEntityRenderer :
     constructor(context: EntityRendererFactory.Context) : super(
         context,
         TallPigEntityModel(context.getPart(HardenedGlassModelLayers.TALL_PIG)),
+        // Figure out this parameter
         0.5f
     ) {
         this.addFeature(
