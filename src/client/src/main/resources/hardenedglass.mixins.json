@@ -4,6 +4,8 @@
   "package": "au.com.programmingclub.hardenedglass.mixin",
   "compatibilityLevel": "JAVA_8",
   "client": [
+    "DirtyChunkSorterMixin",
+    "DistanceChunkSorterMixin",
     "ExampleClientMixin",
     "FurnaceBlockEntityMixin"
   ],
