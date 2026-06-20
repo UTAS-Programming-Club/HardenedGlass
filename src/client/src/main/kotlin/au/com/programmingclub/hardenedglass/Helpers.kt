@@ -1,7 +1,5 @@
 package au.com.programmingclub.hardenedglass
 
-import net.fabricmc.loader.api.FabricLoader
-import net.fabricmc.loader.api.ModContainer
 import net.minecraft.block.Block
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screen.Screen
@@ -16,7 +14,7 @@ import net.minecraft.item.ItemStack
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 import java.awt.image.BufferedImage
-import java.io.File
+import java.io.InputStream
 import java.lang.reflect.InvocationTargetException
 import javax.imageio.ImageIO
 import kotlin.collections.toTypedArray
@@ -522,9 +520,7 @@ object Helpers {
 
     @Throws(Exception::class)
     fun loadImage(texCache: TextureManager, path: String): BufferedImage {
-        val mod: ModContainer = FabricLoader.getInstance().getModContainer("hardenedglass").get()
-        val relativePath: String = path.substring(1)
-        val file: File = mod.findPath(relativePath).get().toFile()
+        val file: InputStream? = this.javaClass.getResourceAsStream(path)
         val image: BufferedImage? = ImageIO.read(file)
         if (image == null) {
             throw Exception("Image corrupted: $path")

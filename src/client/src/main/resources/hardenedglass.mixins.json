@@ -6,8 +6,8 @@
   "client": [
     "DirtyChunkSorterMixin",
     "DistanceChunkSorterMixin",
-    "ExampleClientMixin",
-    "FurnaceBlockEntityMixin"
+    "FurnaceBlockEntityMixin",
+    "MinecraftMixin"
   ],
   "injectors": {
     "defaultRequire": 1

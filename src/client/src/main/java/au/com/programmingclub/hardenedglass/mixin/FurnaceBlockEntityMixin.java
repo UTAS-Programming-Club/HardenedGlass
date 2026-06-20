@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(FurnaceBlockEntity.class)
 public class FurnaceBlockEntityMixin {
-    @Inject(at = @At("HEAD"), method = "getResult", remap = false, cancellable = true)
+    @Inject(at = @At("HEAD"), method = "getResult", cancellable = true)
     private static void getResult(int input, CallbackInfoReturnable<Integer> cir) {
         Helpers.smeltables.forEach((@NotNull Integer smeltableID, @NotNull Integer resultID) -> {
             if (input == smeltableID) {

@@ -15,7 +15,7 @@ public class DirtyChunkSorterMixin {
     private PlayerEntity camera;
 
     @Inject(at = @At("HEAD"), method = "compare", remap = false, cancellable = true)
-    private void fun(Object object2, Object par2, CallbackInfoReturnable<Integer> cir) {
+    private void compare(Object object2, Object par2, CallbackInfoReturnable<Integer> cir) {
         RenderChunk chunk1 = (RenderChunk)object2;
         RenderChunk chunk2 = (RenderChunk)par2;
 
