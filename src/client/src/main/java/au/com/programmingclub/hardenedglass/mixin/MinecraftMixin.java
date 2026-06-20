@@ -9,12 +9,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(Minecraft.class)
 public class MinecraftMixin {
-    @Inject(at = @At("HEAD"), method = "run")
+    @Inject(at = @At("HEAD"), method = "run()V")
     private void run(CallbackInfo info) {
         HardenedGlassInit.INSTANCE.init((Minecraft)(Object)this);
     }
 
-    @Inject(at = @At("HEAD"), method = "tick")
+    @Inject(at = @At("HEAD"), method = "tick()V")
     private void tick(CallbackInfo info) {
         HardenedGlassInit.INSTANCE.tick((Minecraft)(Object)this);
     }

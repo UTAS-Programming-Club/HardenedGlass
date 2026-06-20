@@ -6,7 +6,7 @@
   "client": [
     "DirtyChunkSorterMixin",
     "DistanceChunkSorterMixin",
-    "FurnaceBlockEntityMixin",
+    "InventorySlotMixin",
     "MinecraftMixin"
   ],
   "injectors": {
