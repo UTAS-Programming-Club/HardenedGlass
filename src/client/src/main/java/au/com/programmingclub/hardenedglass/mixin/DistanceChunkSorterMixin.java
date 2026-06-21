@@ -2,7 +2,7 @@ package au.com.programmingclub.hardenedglass.mixin;
 
 import net.minecraft.client.render.world.DistanceChunkSorter;
 import net.minecraft.client.render.world.RenderChunk;
-import net.minecraft.entity.Entity;
+import net.minecraft.entity.mob.player.PlayerEntity;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(DistanceChunkSorter.class)
 public class DistanceChunkSorterMixin {
     @Shadow
-    private Entity camera;
+    private PlayerEntity camera;
 
     @SuppressWarnings("NameDoesntMatchTargetClass")
     @Inject(at = @At("HEAD"), method = "compare(Ljava/lang/Object;Ljava/lang/Object;)I", remap = false, cancellable = true)
