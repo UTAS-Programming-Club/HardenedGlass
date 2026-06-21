@@ -239,11 +239,15 @@ object Helpers {
     }*/
 
     fun AddSmelting(input: Block, output: ItemStack) {
-        smeltables[input.id] = output.id
+        // smeltables[input.id] = output.id
+        // TODO: Switch to something like Lnet/minecraft/block/OreBlock;takeFireDamage(Lnet/minecraft/world/World;FFF)Z
+        AddRecipe(output, "S", "F", Character.valueOf('S'), input, Character.valueOf('F'), Item.COAL)
     }
 
     fun AddSmelting(input: Item, output: ItemStack) {
-        smeltables[input.id] = output.id
+        // smeltables[input.id] = output.id
+        // TODO: Switch to something like Lnet/minecraft/block/OreBlock;takeFireDamage(Lnet/minecraft/world/World;FFF)Z
+        AddRecipe(output, "S", "F", Character.valueOf('S'), input, Character.valueOf('F'), Item.COAL)
     }
 
     /*fun AddSpawn(
