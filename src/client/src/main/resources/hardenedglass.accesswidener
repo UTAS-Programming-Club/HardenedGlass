@@ -4,5 +4,3 @@ accessible method net/minecraft/block/Block setBlastResistance (F)Lnet/minecraft
 accessible method net/minecraft/crafting/CraftingManager registerShaped (Lnet/minecraft/item/ItemStack;[Ljava/lang/Object;)V
 
 accessible field net/minecraft/block/Block GLASS_SOUNDS Lnet/minecraft/block/Block$Sounds;
-accessible field net/minecraft/client/render/entity/PlayerRenderer ARMOR_VARIANTS [Ljava/lang/String;
-mutable    field net/minecraft/client/render/entity/PlayerRenderer ARMOR_VARIANTS [Ljava/lang/String;

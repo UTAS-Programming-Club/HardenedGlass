@@ -9,6 +9,6 @@ object HardenedGlassInit {
     }
 
     fun tick(minecraft: Minecraft) {
-        Helpers.OnTick(0.0f, minecraft)
+        Helpers.onTick(0.0f, minecraft)
     }
 }

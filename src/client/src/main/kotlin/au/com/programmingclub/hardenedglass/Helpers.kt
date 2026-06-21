@@ -6,10 +6,12 @@ import net.minecraft.client.gui.screen.Screen
 import net.minecraft.client.render.texture.DynamicTexture
 import net.minecraft.client.render.texture.TextureManager
 import net.minecraft.crafting.CraftingManager
+import net.minecraft.entity.ItemEntity
 import net.minecraft.entity.mob.player.PlayerEntity
 import net.minecraft.item.BlockItem
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
+import net.minecraft.world.World
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 import java.awt.image.BufferedImage
@@ -21,7 +23,7 @@ import javax.imageio.ImageIO
 // https://github.com/sschr15/rgml-quilt/blob/f0e4c913fc7cac8b3c3fbcc2d6b64c70a0837c12/src/main/risugami/org/duvetmc/rgml/ModLoader.java
 // Used under MIT License
 
-@Suppress("unused", "FunctionName", "GrazieInspection", "SpellCheckingInspection")
+@Suppress("unused", "GrazieInspection", "SpellCheckingInspection")
 object Helpers {
     private val animList: MutableList<DynamicTexture> = mutableListOf()
     // private val blockModels: MutableMap<Int?, BaseMod?> = HashMap<Int?, BaseMod?>()
@@ -53,8 +55,7 @@ object Helpers {
     private var texturesAdded = false
     private val usedItemSprites = BooleanArray(256)
     private val usedTerrainSprites = BooleanArray(256)
-    @JvmField
-    val smeltables: MutableMap<Int, Int> = mutableMapOf()
+    private val smeltables: MutableMap<Int, Int> = mutableMapOf()
 
     /*fun AddAchievementDesc(achievement: AchievementStat, name: String?, description: String?) {
         try {
@@ -202,7 +203,7 @@ object Helpers {
             return i
         } catch (e: Exception) {
             logger.error("Error in addOverride", e)
-            ThrowException(e)
+            throwException(e)
             throw RuntimeException(e)
         }
     }
@@ -228,7 +229,7 @@ object Helpers {
         overlays[overlayPath] = index
     }
 
-    fun AddRecipe(output: ItemStack, vararg params: Any) {
+    fun addRecipe(output: ItemStack, vararg params: Any) {
         CraftingManager.getInstance().registerShaped(output, *params)
     }
 
@@ -236,16 +237,12 @@ object Helpers {
         CraftingManager.getInstance().registerShapeless(output, *params)
     }*/
 
-    fun AddSmelting(input: Block, output: ItemStack) {
-        // smeltables[input.id] = output.id
-        // TODO: Switch to something like Lnet/minecraft/block/OreBlock;takeFireDamage(Lnet/minecraft/world/World;FFF)Z
-        AddRecipe(output, "S", "F", Character.valueOf('S'), input, Character.valueOf('F'), Item.COAL)
+    fun addSmelting(input: Block, output: ItemStack) {
+        smeltables[input.id] = output.id
     }
 
-    fun AddSmelting(input: Item, output: ItemStack) {
-        // smeltables[input.id] = output.id
-        // TODO: Switch to something like Lnet/minecraft/block/OreBlock;takeFireDamage(Lnet/minecraft/world/World;FFF)Z
-        AddRecipe(output, "S", "F", Character.valueOf('S'), input, Character.valueOf('F'), Item.COAL)
+    fun addSmelting(input: Item, output: ItemStack) {
+        smeltables[input.id] = output.id
     }
 
     /*fun AddSpawn(
@@ -338,7 +335,7 @@ object Helpers {
 
             val e = Exception("No more empty item sprite indices left!")
             logger.error("Error in getUniqueItemSpriteIndex", e)
-            ThrowException(e)
+            throwException(e)
             return 0
         }
 
@@ -353,7 +350,7 @@ object Helpers {
             else -> {
                 val e = Exception("No registry for this texture: $path")
                 logger.error("Error in getUniqueItemSpriteIndex", e)
-                ThrowException(e)
+                throwException(e)
                 return 0
             }
         }
@@ -373,11 +370,12 @@ object Helpers {
 
             val e = Exception("No more empty terrain sprite indices left!")
             logger.error("Error in getUniqueItemSpriteIndex", e)
-            ThrowException(e)
+            throwException(e)
             return 0
         }
 
     fun init(minecraft: Minecraft) {
+        // TODO: Determine at startup
         val usedItemSpritesString =
             "1111111111111111111111111111111111111101111111011111111111111001111111111111111111111111111011111111100110000011111110000000001111111001100000110000000100000011000000010000001100000000000000110000000000000000000000000000000000000000000000001100000000000000"
         val usedTerrainSpritesString =
@@ -434,23 +432,23 @@ object Helpers {
             method_RegisterEntityID.setAccessible(true)*/
         } catch (e: SecurityException) {
             logger.error("Error in init", e)
-            ThrowException(e)
+            throwException(e)
             throw RuntimeException(e)
         } catch (e: IllegalAccessException) {
             logger.error("Error in init", e)
-            ThrowException(e)
+            throwException(e)
             throw RuntimeException(e)
         } catch (e: IllegalArgumentException) {
             logger.error("Error in init", e)
-            ThrowException(e)
+            throwException(e)
             throw RuntimeException(e)
         } catch (e: NoSuchMethodException) {
             logger.error("Error in init", e)
-            ThrowException(e)
+            throwException(e)
             throw RuntimeException(e)
         } catch (e: NoSuchFieldException) {
             logger.error("Error in init", e)
-            ThrowException(e)
+            throwException(e)
             throw RuntimeException(e)
         }
 
@@ -460,7 +458,7 @@ object Helpers {
             initStats()
         } catch (e: Exception) {
             logger.error("Error in init", e)
-            ThrowException("ModLoader has failed to initialize.", e)
+            throwException("ModLoader has failed to initialize.", e)
 
             throw RuntimeException(e)
         }
@@ -537,9 +535,9 @@ object Helpers {
         }
     }*/
 
-    fun OnTick(tick: Float, game: Minecraft) {
+    fun onTick(tick: Float, game: Minecraft) {
         if (!texturesAdded && game.textureManager != null) {
-            RegisterAllTextureOverrides(game.textureManager)
+            registerAllTextureOverrides(game.textureManager)
             texturesAdded = true
         }
 
@@ -589,7 +587,7 @@ object Helpers {
         clock = newclock*/
     }
 
-    fun OpenGUI(player: PlayerEntity, gui: Screen?) {
+    fun openGUI(player: PlayerEntity, gui: Screen?) {
         val game = minecraftInstance
         if (game.player === player && gui != null) {
             game.openScreen(gui)
@@ -626,7 +624,7 @@ object Helpers {
         return combinedList.toTypedArray<KeyBinding?>()
     }*/
 
-    fun RegisterAllTextureOverrides(cache: TextureManager) {
+    fun registerAllTextureOverrides(cache: TextureManager) {
         animList.clear()
         /* val game = minecraftInstance
 
@@ -650,7 +648,7 @@ object Helpers {
                     cache.addDynamicTexture(anim)
                 } catch (e: Exception) {
                     logger.error("Error in RegisterAllTextureOverrides", e)
-                    ThrowException(e)
+                    throwException(e)
                     throw RuntimeException(e)
                 }
             }
@@ -658,7 +656,7 @@ object Helpers {
     }
 
     @JvmOverloads
-    fun RegisterBlock(block: Block, itemClass: Class<out BlockItem>? = null) {
+    fun registerBlock(block: Block, itemClass: Class<out BlockItem>? = null) {
         try {
             val id = block.id
             val item: BlockItem = if (itemClass != null) {
@@ -672,22 +670,22 @@ object Helpers {
             }
         } catch (e: IllegalArgumentException) {
             logger.error("Error in RegisterBlock", e)
-            ThrowException(e)
+            throwException(e)
         } catch (e: NoSuchMethodException) {
             logger.error("Error in RegisterBlock", e)
-            ThrowException(e)
+            throwException(e)
         } catch (e: InvocationTargetException) {
             logger.error("Error in RegisterBlock", e)
-            ThrowException(e)
+            throwException(e)
         } catch (e: InstantiationException) {
             logger.error("Error in RegisterBlock", e)
-            ThrowException(e)
+            throwException(e)
         } catch (e: SecurityException) {
             logger.error("Error in RegisterBlock", e)
-            ThrowException(e)
+            throwException(e)
         } catch (e: IllegalAccessException) {
             logger.error("Error in RegisterBlock", e)
-            ThrowException(e)
+            throwException(e)
         }
     }
 
@@ -760,7 +758,7 @@ object Helpers {
         }
     }*/
 
-    fun RenderBlockIsItemFull3D(modelID: Int): Boolean {
+    fun renderBlockIsItemFull3D(modelID: Int): Boolean {
         return if (!blockSpecialInv.containsKey(modelID)) {
             modelID == 16
         } else {
@@ -850,13 +848,29 @@ object Helpers {
         }
     }*/
 
-    fun ThrowException(message: String, e: Exception) {
+    private fun throwException(message: String, e: Exception) {
         // minecraftInstance.handleCrash(CrashException(message, e))
         throw e
     }
 
-    private fun ThrowException(e: Exception) {
-        ThrowException("Exception occurred in ModLoader", e)
+    private fun throwException(e: Exception) {
+        throwException("Exception occurred in ModLoader", e)
+    }
+
+    @JvmStatic
+    fun smeltFlammable(world: World, x: Float, y: Float, z: Float, flammableID: Int): Boolean {
+        val resultID: Int = smeltables[flammableID] ?: return false
+
+        val randX: Float = world.random.nextFloat() * 0.7f + 0.15f
+        val randY: Float = world.random.nextFloat() * 0.7f + 0.15f
+        val randZ: Float = world.random.nextFloat() * 0.7f + 0.15f
+
+        val result = ItemEntity(world, x + randX, y + randY, z + randZ, ItemStack(resultID))
+        result.pickUpDelay = 10
+
+        world.addEntity(result)
+
+        return true
     }
 }
 

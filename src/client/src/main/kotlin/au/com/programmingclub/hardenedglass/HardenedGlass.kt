@@ -28,8 +28,8 @@ object HardenedGlass {
     private val HardenedGlassBlock: Block = HardenedGlassBlock()
 
     fun onReady() {
-        Helpers.RegisterBlock(HardenedGlassBlock)
+        Helpers.registerBlock(HardenedGlassBlock)
         // Helpers.AddName(HardenedGlassBlock, "Hardened Glass")
-        Helpers.AddSmelting(Block.GLASS, ItemStack(HardenedGlassBlock))
+        Helpers.addSmelting(Block.GLASS, ItemStack(HardenedGlassBlock))
     }
 }
