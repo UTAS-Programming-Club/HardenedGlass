@@ -3,7 +3,6 @@ package au.com.programmingclub.hardenedglass
 import net.minecraft.block.Block
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screen.Screen
-import net.minecraft.client.render.entity.PlayerRenderer
 import net.minecraft.client.render.texture.DynamicTexture
 import net.minecraft.client.render.texture.TextureManager
 import net.minecraft.crafting.CraftingManager
@@ -17,7 +16,6 @@ import java.awt.image.BufferedImage
 import java.io.InputStream
 import java.lang.reflect.InvocationTargetException
 import javax.imageio.ImageIO
-import kotlin.collections.toTypedArray
 
 // Partial port of rgml-quilt's version of ModLoader to beta 1.7.3
 // https://github.com/sschr15/rgml-quilt/blob/f0e4c913fc7cac8b3c3fbcc2d6b64c70a0837c12/src/main/risugami/org/duvetmc/rgml/ModLoader.java
@@ -141,7 +139,7 @@ object Helpers {
         }
 
         animList.add(anim)
-    }*/
+    }
 
     fun AddArmor(armor: String): Int {
         val index = PlayerRenderer.ARMOR_VARIANTS.indexOf(armor)
@@ -156,7 +154,7 @@ object Helpers {
         return combinedList.indexOf(armor)
     }
 
-    /*fun AddLocalization(key: String, value: String) {
+    fun AddLocalization(key: String, value: String) {
         Language.getInstance().translations[key] = value
     }
 
