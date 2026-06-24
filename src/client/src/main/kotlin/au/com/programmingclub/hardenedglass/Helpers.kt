@@ -5,7 +5,6 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screen.Screen
 import net.minecraft.client.render.texture.DynamicTexture
 import net.minecraft.client.render.texture.TextureManager
-import net.minecraft.crafting.CraftingManager
 import net.minecraft.entity.ItemEntity
 import net.minecraft.entity.mob.player.PlayerEntity
 import net.minecraft.item.BlockItem
@@ -230,7 +229,7 @@ object Helpers {
     }
 
     fun addRecipe(output: ItemStack, vararg params: Any) {
-        CraftingManager.getInstance().registerShaped(output, *params)
+        // CraftingManager.getInstance().registerShaped(output, *params)
     }
 
     /*fun AddShapelessRecipe(output: ItemStack, vararg params: Any) {

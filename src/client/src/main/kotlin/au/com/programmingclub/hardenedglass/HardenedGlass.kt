@@ -42,6 +42,6 @@ object HardenedGlass {
     fun onReady() {
         Helpers.registerBlock(HardenedGlassBlock)
         // Helpers.AddName(HardenedGlassBlock, "Hardened Glass")
-        Helpers.addSmelting(Block.GLASS, ItemStack(HardenedGlassBlock))
+        Helpers.addSmelting(Block.GLASS, ItemStack(HardenedGlassBlock.id))
     }
 }
