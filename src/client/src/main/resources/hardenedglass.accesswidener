@@ -1,6 +1,6 @@
 accessWidener v1 named
 
+accessible field net/minecraft/block/Block METAL_SOUNDS Lnet/minecraft/block/Block$Sounds;
+
 accessible method net/minecraft/block/Block setBlastResistance (F)Lnet/minecraft/block/Block;
 accessible method net/minecraft/crafting/CraftingManager registerShaped (Lnet/minecraft/item/ItemStack;[Ljava/lang/Object;)V
-
-accessible field net/minecraft/block/Block GLASS_SOUNDS Lnet/minecraft/block/Block$Sounds;
