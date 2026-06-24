@@ -1,7 +1,6 @@
 package au.com.programmingclub.hardenedglass
 
 import net.minecraft.block.Block
-import net.minecraft.block.material.Material
 import net.minecraft.item.ItemStack
 import net.minecraft.world.World
 import java.util.Random
@@ -10,7 +9,6 @@ class HardenedGlassBlock : Block {
     constructor() : super(
         100,
         Helpers.addOverride("/terrain.png", "/assets/hardenedglass/textures/block/hardened_glass/hardened_glass.png"),
-        Material.GLASS
     ) {
         setStrength(10f)
         setBlastResistance(9f)
