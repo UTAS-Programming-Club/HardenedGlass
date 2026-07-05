@@ -1,6 +1,6 @@
 package au.com.programmingclub.hardenedglass.entity
 
-import au.com.programmingclub.hardenedglass.namespace
+import au.com.programmingclub.hardenedglass.MOD_ID
 import net.minecraft.client.model.Dilation
 import net.minecraft.client.model.ModelData
 import net.minecraft.client.model.ModelPart
@@ -67,7 +67,7 @@ class LongPigEntityModel(root: ModelPart) :
 class LongPigEntityRenderer :
     MobEntityRenderer<LongPigEntity, LongPigEntityModel> {
     companion object {
-        private val TEXTURE = Identifier(namespace, "textures/entity/long_pig/long_pig.png")
+        private val TEXTURE = Identifier(MOD_ID, "textures/entity/long_pig/long_pig.png")
     }
 
     constructor(context: EntityRendererFactory.Context) : super(

@@ -10,60 +10,78 @@ import net.minecraft.registry.Registries
 import net.minecraft.registry.Registry
 import net.minecraft.util.Identifier
 
-////////////////// LONG BACON /////////////////////
-private val LongBaconItemIdentifier = Identifier(namespace, "long_bacon")
-private val LongBaconItemProperties: FoodComponent = FoodComponent.Builder()
-    .nutrition(2)
-    .snack()
-    .alwaysEdible()
-    .saturationModifier(2F)
-    .statusEffect(StatusEffectInstance(StatusEffects.SPEED, 300, 2), 1f)
-    .build()
-private val LongBaconItem = Item(Item.Settings().food(LongBaconItemProperties))
+data object BaconItems {
+    fun init() {
+        // SANITY(unusual):
+        // Empty function in order to call initialiser of object.
+        // The Fabric API will reflect through all variables in this object and register them for us.
+    }
 
-// RAW //
-private val RawLongBaconItemIdentifier = Identifier(namespace, "raw_long_bacon")
-private val RawLongBaconItemProperties: FoodComponent = FoodComponent.Builder()
-    .nutrition(2)
-    .snack()
-    .alwaysEdible()
-    .saturationModifier(2F)
-    .statusEffect(StatusEffectInstance(StatusEffects.SLOWNESS, 300, 2), 1f)
-    .build()
-private val RawLongBaconItem = Item(Item.Settings().food(RawLongBaconItemProperties))
+    @JvmField
+    val LONG_BACON: Item = registerItem(
+        Item(
+            Item.Settings().food(
+                FoodComponent.Builder()
+                    .nutrition(2)
+                    .snack()
+                    .alwaysEdible()
+                    .saturationModifier(2F)
+                    .statusEffect(StatusEffectInstance(StatusEffects.SPEED, 300, 2), 1f)
+                    .build()
+            ),
+        ),
+        "long_bacon",
+    )
 
-////////////////// TALL BACON /////////////////////
-private val TallBaconItemIdentifier = Identifier(namespace, "tall_bacon")
-private val TallBaconItemProperties: FoodComponent = FoodComponent.Builder()
-    .nutrition(2)
-    .snack()
-    .alwaysEdible()
-    .saturationModifier(2F)
-    .statusEffect(StatusEffectInstance(StatusEffects.JUMP_BOOST, 300, 2), 1f)
-    .build()
-private val TallBaconItem = Item(Item.Settings().food(TallBaconItemProperties))
+    @JvmField
+    val RAW_LONG_BACON: Item = registerItem(
+        Item(
+            Item.Settings().food(
+                FoodComponent.Builder()
+                    .nutrition(2)
+                    .snack()
+                    .alwaysEdible()
+                    .saturationModifier(2F)
+                    .statusEffect(StatusEffectInstance(StatusEffects.SLOWNESS, 300, 2), 1f)
+                    .build(),
+            ),
+        ),
+        "raw_long_bacon",
+    )
 
-// RAW //
-private val RawTallBaconItemIdentifier = Identifier(namespace, "raw_tall_bacon")
-private val RawTallBaconItemProperties: FoodComponent = FoodComponent.Builder()
-    .nutrition(2)
-    .snack()
-    .alwaysEdible()
-    .saturationModifier(2F)
-    .statusEffect(StatusEffectInstance(StatusEffects.JUMP_BOOST, 300, 2), 1f)
-    .build()
-private val RawTallBaconItem = Item(Item.Settings().food(RawTallBaconItemProperties))
+    @JvmField
+    val TALL_BACON: Item = registerItem(
+        Item(
+            Item.Settings().food(
+                FoodComponent.Builder()
+                    .nutrition(2)
+                    .snack()
+                    .alwaysEdible()
+                    .saturationModifier(2F)
+                    .statusEffect(StatusEffectInstance(StatusEffects.JUMP_BOOST, 300, 2), 1f)
+                    .build(),
+            ),
+        ),
+        "tall_bacon",
+    )
 
-fun registerBaconItems() {
-    Registry.register(Registries.ITEM, LongBaconItemIdentifier, LongBaconItem)
-    Registry.register(Registries.ITEM, RawLongBaconItemIdentifier, RawLongBaconItem)
-    Registry.register(Registries.ITEM, TallBaconItemIdentifier, TallBaconItem)
-    Registry.register(Registries.ITEM, RawTallBaconItemIdentifier, RawTallBaconItem)
+    @JvmField
+    val RAW_TALL_BACON: Item = registerItem(
+        Item(
+            Item.Settings().food(
+                FoodComponent.Builder()
+                    .nutrition(2)
+                    .snack()
+                    .alwaysEdible()
+                    .saturationModifier(2F)
+                    .statusEffect(StatusEffectInstance(StatusEffects.JUMP_BOOST, 300, 2), 1f)
+                    .build(),
+            ),
+        ),
+        "raw_tall_bacon",
+    )
 
-    ItemGroupEvents.modifyEntriesEvent(ItemGroups.FOOD_AND_DRINK).register { content ->
-        content.add(LongBaconItem)
-        content.add(RawLongBaconItem)
-        content.add(TallBaconItem)
-        content.add(RawTallBaconItem)
+    fun <T : Item> registerItem(item: T, identifier: String): T {
+        return Registry.register(Registries.ITEM, Identifier(MOD_ID, identifier), item)
     }
 }

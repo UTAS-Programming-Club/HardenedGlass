@@ -1,6 +1,6 @@
 package au.com.programmingclub.hardenedglass.entity
 
-import au.com.programmingclub.hardenedglass.namespace
+import au.com.programmingclub.hardenedglass.MOD_ID
 import net.minecraft.client.model.Dilation
 import net.minecraft.client.model.ModelData
 import net.minecraft.client.model.ModelPart
@@ -75,7 +75,7 @@ class TallPigEntityModel(root: ModelPart) :
 class TallPigEntityRenderer :
     MobEntityRenderer<TallPigEntity, TallPigEntityModel> {
     companion object {
-        private val TEXTURE = Identifier(namespace, "textures/entity/tall_pig/tall_pig.png")
+        private val TEXTURE = Identifier(MOD_ID, "textures/entity/tall_pig/tall_pig.png")
     }
 
     constructor(context: EntityRendererFactory.Context) : super(
@@ -88,7 +88,7 @@ class TallPigEntityRenderer :
             SaddleFeatureRenderer(
                 this,
                 TallPigEntityModel(context.getPart(HardenedGlassModelLayers.TALL_PIG_SADDLE)),
-                Identifier(namespace, "textures/entity/tall_pig/tall_pig_saddle.png")
+                Identifier(MOD_ID, "textures/entity/tall_pig/tall_pig_saddle.png")
             )
         )
     }
