@@ -22,7 +22,8 @@ data object HardenedGlassEntities {
             val pig = EntityType.PIG
             val pigDimensions = pig.dimensions
 
-            val entityBuilder: EntityType.Builder<LongPigEntity> = EntityType.Builder.create(::LongPigEntity, pig.spawnGroup)
+            val entityBuilder: EntityType.Builder<LongPigEntity> =
+                EntityType.Builder.create(::LongPigEntity, pig.spawnGroup)
             entityBuilder.dimensions(2 * pigDimensions.width(), pigDimensions.height())
             // EntityType.PIG also calls passengerAttachments but not including this appears better for tall pig so doing the same here for consistency
             // Skipping it appears to have no impact on rider position
@@ -40,7 +41,8 @@ data object HardenedGlassEntities {
             val pig = EntityType.PIG
             val pigDimensions = pig.dimensions
 
-            val entityBuilder: EntityType.Builder<TallPigEntity> = EntityType.Builder.create(::TallPigEntity, pig.spawnGroup)
+            val entityBuilder: EntityType.Builder<TallPigEntity> =
+                EntityType.Builder.create(::TallPigEntity, pig.spawnGroup)
             // TODO: Make sure 5/3 is the correct factor
             entityBuilder.dimensions(pigDimensions.width(), 5f / 3f * pigDimensions.height())
             // EntityType.PIG also calls passengerAttachments but doing so here would require calculating the new rider height by hand
