@@ -12,9 +12,13 @@ import net.minecraft.util.Identifier
 
 data object BaconItems {
     fun init() {
-        // SANITY(unusual):
-        // Empty function in order to call initialiser of object.
-        // The Fabric API will reflect through all variables in this object and register them for us.
+        // TODO: Move to seperate group, find better method
+        ItemGroupEvents.modifyEntriesEvent(ItemGroups.FOOD_AND_DRINK).register { content ->
+            content.add(LONG_BACON)
+            content.add(RAW_LONG_BACON)
+            content.add(TALL_BACON)
+            content.add(RAW_TALL_BACON)
+        }
     }
 
     @JvmField
@@ -65,6 +69,7 @@ data object BaconItems {
         "tall_bacon",
     )
 
+    // TODO: Use a different effect than cooked tall bacon
     @JvmField
     val RAW_TALL_BACON: Item = registerItem(
         Item(

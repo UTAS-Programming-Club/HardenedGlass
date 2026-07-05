@@ -14,7 +14,12 @@ import net.minecraft.util.Identifier
 
 // TODO: Refactor, too annoying to do in TUI.
 data object HardenedGlassBlock {
-    fun init() {}
+    fun init() {
+        // TODO: Move to seperate group, find better method
+        ItemGroupEvents.modifyEntriesEvent(ItemGroups.COLORED_BLOCKS).register { content ->
+            content.add(HARDENED_GLASS)
+        }
+    }
 
     @JvmField
     val HARDENED_GLASS: TransparentBlock = registerBlock(

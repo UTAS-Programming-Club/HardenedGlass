@@ -11,11 +11,13 @@ import net.minecraft.registry.Registries
 import net.minecraft.registry.Registry
 import net.minecraft.util.Identifier
 
+// TODO: Add helper method for creating entities
 data object HardenedGlassEntities {
     val LONG_PIG_ID = Identifier(MOD_ID, "long_pig")
     val LONG_PIG: EntityType<LongPigEntity> = Registry.register(
         Registries.ENTITY_TYPE,
         LONG_PIG_ID,
+        // TODO: Add additional difference to vanilla pig?
         run {
             val pig = EntityType.PIG
             val pigDimensions = pig.dimensions
@@ -33,6 +35,7 @@ data object HardenedGlassEntities {
     val TALL_PIG: EntityType<TallPigEntity> = Registry.register(
         Registries.ENTITY_TYPE,
         TALL_PIG_ID,
+        // TODO: Add additional difference to vanilla pig?
         run {
             val pig = EntityType.PIG
             val pigDimensions = pig.dimensions
