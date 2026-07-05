@@ -11,16 +11,19 @@ import net.minecraft.registry.Registries
 import net.minecraft.registry.Registry
 import net.minecraft.util.Identifier
 
+// TODO: Add helper method for creating entities
 data object HardenedGlassEntities {
     val LONG_PIG_ID = Identifier(MOD_ID, "long_pig")
     val LONG_PIG: EntityType<LongPigEntity> = Registry.register(
         Registries.ENTITY_TYPE,
         LONG_PIG_ID,
+        // TODO: Add additional difference to vanilla pig?
         run {
             val pig = EntityType.PIG
             val pigDimensions = pig.dimensions
 
-            val entityBuilder = EntityType.Builder<LongPigEntity>.create(::LongPigEntity, pig.spawnGroup)
+            val entityBuilder: EntityType.Builder<LongPigEntity> =
+                EntityType.Builder.create(::LongPigEntity, pig.spawnGroup)
             entityBuilder.dimensions(2 * pigDimensions.width(), pigDimensions.height())
             // EntityType.PIG also calls passengerAttachments but not including this appears better for tall pig so doing the same here for consistency
             // Skipping it appears to have no impact on rider position
@@ -33,11 +36,13 @@ data object HardenedGlassEntities {
     val TALL_PIG: EntityType<TallPigEntity> = Registry.register(
         Registries.ENTITY_TYPE,
         TALL_PIG_ID,
+        // TODO: Add additional difference to vanilla pig?
         run {
             val pig = EntityType.PIG
             val pigDimensions = pig.dimensions
 
-            val entityBuilder = EntityType.Builder<TallPigEntity>.create(::TallPigEntity, pig.spawnGroup)
+            val entityBuilder: EntityType.Builder<TallPigEntity> =
+                EntityType.Builder.create(::TallPigEntity, pig.spawnGroup)
             // TODO: Make sure 5/3 is the correct factor
             entityBuilder.dimensions(pigDimensions.width(), 5f / 3f * pigDimensions.height())
             // EntityType.PIG also calls passengerAttachments but doing so here would require calculating the new rider height by hand

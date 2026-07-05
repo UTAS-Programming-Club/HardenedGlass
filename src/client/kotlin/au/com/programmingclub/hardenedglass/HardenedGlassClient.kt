@@ -7,6 +7,7 @@ import net.minecraft.client.render.RenderLayer
 
 object HardenedGlassClient : ClientModInitializer {
     override fun onInitializeClient() {
+        // TODO: Setup connected textures without athena
         // This entrypoint is suitable for setting up client-specific logic, such as rendering.
         BlockRenderLayerMap.INSTANCE.putBlock(HardenedGlassBlock.HARDENED_GLASS, RenderLayer.getCutout())
 
