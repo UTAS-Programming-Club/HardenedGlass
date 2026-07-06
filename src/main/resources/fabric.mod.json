@@ -8,7 +8,7 @@
 		"Joshua Wierenga"
 	],
 	"contact": {
-		"homepage": "",
+		"homepage": "https://programmingclub.com.au",
 		"sources": "https://github.com/UTAS-Programming-Club/HardenedGlass"
 	},
 	"license": "",
@@ -28,21 +28,11 @@
 			}
 		]
 	},
-	"mixins": [
-		"hardenedglass.mixins.json",
-		{
-			"config": "hardenedglass.client.mixins.json",
-			"environment": "client"
-		}
-	],
 	"depends": {
-		"fabricloader": ">=0.15.10",
+		"fabricloader": ">=0.18.4",
 		"minecraft": "~1.20.6",
 		"java": ">=21",
 		"fabric-api": "*",
 		"fabric-language-kotlin": "*"
-	},
-	"suggests": {
-		"another-mod": "*"
 	}
 }
