@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:smelting",
+  "ingredient": {
+    "item": "hardenedglass:raw_tall_bacon",
+    "category": "blocks"
+  },
+  "result": {
+    "id": "hardenedglass:tall_bacon"
+  },
+  "experience": 0.1
+}
