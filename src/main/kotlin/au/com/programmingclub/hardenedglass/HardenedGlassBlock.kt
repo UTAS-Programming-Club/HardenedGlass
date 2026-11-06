@@ -1,40 +1,49 @@
 package au.com.programmingclub.hardenedglass
 
-import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents
-import net.minecraft.block.AbstractBlock
-import net.minecraft.block.Block
-import net.minecraft.block.Blocks.GLASS
-import net.minecraft.block.TransparentBlock
-import net.minecraft.item.BlockItem
-import net.minecraft.item.Item
-import net.minecraft.item.ItemGroups
-import net.minecraft.registry.Registries
-import net.minecraft.registry.Registry
-import net.minecraft.util.Identifier
+import net.fabricmc.fabric.api.creativetab.v1.CreativeModeTabEvents
+import net.minecraft.core.Registry
+import net.minecraft.core.registries.BuiltInRegistries
+import net.minecraft.references.BlockItemId
+import net.minecraft.resources.Identifier
+import net.minecraft.world.item.BlockItem
+import net.minecraft.world.item.CreativeModeTabs
+import net.minecraft.world.item.Item
+import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.Blocks.GLASS
+import net.minecraft.world.level.block.TransparentBlock
+import net.minecraft.world.level.block.state.BlockBehaviour
 
 // TODO: Refactor, too annoying to do in TUI.
 data object HardenedGlassBlock {
     fun init() {
-        // TODO: Move to seperate group, find better method
-        ItemGroupEvents.modifyEntriesEvent(ItemGroups.COLORED_BLOCKS).register { content ->
-            content.add(HARDENED_GLASS)
+        // TODO: Move to separate group, find better method
+        CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.COLORED_BLOCKS).register { content ->
+            content.accept(HARDENED_GLASS)
         }
     }
 
     @JvmField
     val HARDENED_GLASS: TransparentBlock = registerBlock(
-        TransparentBlock(
-            AbstractBlock.Settings.copy(GLASS)
-                .hardness(10f)
-                .resistance(9f),
-        ),
+        ::TransparentBlock,
+        BlockBehaviour.Properties.ofFullCopy(GLASS)
+                .destroyTime(10f)
+                .explosionResistance(9f),
         "hardened_glass",
     )
 
-    fun <T : Block> registerBlock(block: T, identifier: String): T {
-        val identifier = Identifier(MOD_ID, identifier)
-        val block: T = Registry.register(Registries.BLOCK, identifier, block)
-        Registry.register(Registries.ITEM, identifier, BlockItem(block, Item.Settings()))
+    fun <T : Block> registerBlock(blockFactory: (BlockBehaviour.Properties) -> T, properties: BlockBehaviour.Properties, identifier: String): T {
+        val identifier: Identifier = HardenedGlass.id(identifier)
+        val blockItemId = BlockItemId.create(identifier, identifier)
+
+        val block: T = blockFactory(properties.setId(blockItemId.block))
+        Registry.register(BuiltInRegistries.BLOCK, blockItemId.block, block)
+
+        val properties = Item.Properties()
+            .useBlockDescriptionPrefix()
+            .setId(blockItemId.item)
+        val blockItem = BlockItem(block, properties)
+        Registry.register(BuiltInRegistries.ITEM, blockItemId.item, blockItem)
+
         return block
     }
 }

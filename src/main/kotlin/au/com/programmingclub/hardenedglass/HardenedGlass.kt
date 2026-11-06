@@ -2,9 +2,9 @@ package au.com.programmingclub.hardenedglass
 
 import au.com.programmingclub.hardenedglass.entity.HardenedGlassEntities
 import net.fabricmc.api.ModInitializer
-import net.minecraft.util.Identifier
+import net.minecraft.resources.Identifier
 
-const val MOD_ID = "hardenedglass"
+// const val MOD_ID = "hardenedglass"
 
 data object HardenedGlass : ModInitializer {
     override fun onInitialize() {
@@ -14,5 +14,5 @@ data object HardenedGlass : ModInitializer {
     }
 
     fun id(path: String): Identifier
-        = Identifier(MOD_ID, path)
+            = Identifier.fromNamespaceAndPath("hardenedglass", path)
 }

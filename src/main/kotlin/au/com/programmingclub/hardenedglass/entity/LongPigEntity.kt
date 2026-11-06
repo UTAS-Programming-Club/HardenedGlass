@@ -1,24 +1,25 @@
 package au.com.programmingclub.hardenedglass.entity
 
-import net.minecraft.entity.EntityType
-import net.minecraft.entity.attribute.DefaultAttributeContainer
-import net.minecraft.entity.attribute.EntityAttributes
-import net.minecraft.entity.passive.PassiveEntity
-import net.minecraft.entity.passive.PigEntity
-import net.minecraft.server.world.ServerWorld
-import net.minecraft.world.World
+import net.minecraft.server.level.ServerLevel
+import net.minecraft.world.entity.AgeableMob
+import net.minecraft.world.entity.EntitySpawnReason
+import net.minecraft.world.entity.EntityType
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier
+import net.minecraft.world.entity.ai.attributes.Attributes
+import net.minecraft.world.entity.animal.pig.Pig
+import net.minecraft.world.level.Level
 
 // --------------- Test Entity ---------------
 // TODO: Change objectives or breeding foods?
-class LongPigEntity(entityType: EntityType<LongPigEntity>, world: World) : PigEntity(entityType, world) {
+class LongPigEntity(entityType: EntityType<LongPigEntity>, level: Level) : Pig(entityType, level) {
     companion object {
         // TODO: Add additional difference to vanilla pig?
-        fun createMobAttribute(): DefaultAttributeContainer.Builder {
-            return createPigAttributes().add(EntityAttributes.GENERIC_MOVEMENT_SPEED, .3)
+        fun createMobAttribute(): AttributeSupplier.Builder {
+            return createAttributes().add(Attributes.MOVEMENT_SPEED, .3)
         }
     }
 
-    override fun createChild(serverWorld: ServerWorld, passiveEntity: PassiveEntity): LongPigEntity? {
-        return HardenedGlassEntities.LONG_PIG.create(serverWorld)
+    override fun getBreedOffspring(serverLevel: ServerLevel, passiveEntity: AgeableMob): LongPigEntity? {
+        return HardenedGlassEntities.LONG_PIG.create(serverLevel, EntitySpawnReason.BREEDING)
     }
 }

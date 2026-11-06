@@ -1,5 +1,5 @@
 plugins {
-	id("net.fabricmc.fabric-loom-remap")
+	id("net.fabricmc.fabric-loom")
 	id("maven-publish")
 	id("org.jetbrains.kotlin.jvm")
 }
@@ -21,12 +21,11 @@ loom {
 dependencies {
 	// To change the versions see the gradle.properties file
 	minecraft("com.mojang:minecraft:${property("minecraft_version")}")
-	mappings("net.fabricmc:yarn:${property("yarn_mappings")}:v2")
-	modImplementation("net.fabricmc:fabric-loader:${property("loader_version")}")
+	implementation("net.fabricmc:fabric-loader:${property("loader_version")}")
 
 	// Fabric API. This is technically optional, but you probably want it anyway.
-	modImplementation("net.fabricmc.fabric-api:fabric-api:${property("fabric_api_version")}")
-	modImplementation("net.fabricmc:fabric-language-kotlin:${property("fabric_kotlin_version")}")
+	implementation("net.fabricmc.fabric-api:fabric-api:${property("fabric_api_version")}")
+	implementation("net.fabricmc:fabric-language-kotlin:${property("fabric_kotlin_version")}")
 }
 
 tasks.processResources {
@@ -38,7 +37,7 @@ tasks.processResources {
 	}
 }
 
-kotlin.jvmToolchain(21)
+kotlin.jvmToolchain(25)
 
 java {
 	// Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task

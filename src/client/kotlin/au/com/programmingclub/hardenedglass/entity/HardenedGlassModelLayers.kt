@@ -1,20 +1,17 @@
 package au.com.programmingclub.hardenedglass.entity
 
-import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry
-import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry
-import net.minecraft.client.render.entity.model.EntityModelLayer
+import net.fabricmc.fabric.api.client.rendering.v1.ModelLayerRegistry
+import net.minecraft.client.model.geom.ModelLayerLocation
+
 
 object HardenedGlassModelLayers {
-    val LONG_PIG = EntityModelLayer(HardenedGlassEntities.LONG_PIG_ID, "main")
-    val TALL_PIG = EntityModelLayer(HardenedGlassEntities.TALL_PIG_ID, "main")
-    val TALL_PIG_SADDLE = EntityModelLayer(HardenedGlassEntities.TALL_PIG_ID, "saddle")
+    // val LONG_PIG = ModelLayerLocation(HardenedGlassEntities.LONG_PIG_ID, "main")
+    // val TALL_PIG = ModelLayerLocation(HardenedGlassEntities.TALL_PIG_ID, "main")
+    // val TALL_PIG_SADDLE = ModelLayerLocation(HardenedGlassEntities.TALL_PIG_ID, "saddle")
 
     fun registerEntityModels() {
-        EntityRendererRegistry.register(HardenedGlassEntities.LONG_PIG, ::LongPigEntityRenderer)
-        EntityRendererRegistry.register(HardenedGlassEntities.TALL_PIG, ::TallPigEntityRenderer)
-
-        EntityModelLayerRegistry.registerModelLayer(LONG_PIG, LongPigEntityModel::getTexturedModelData)
-        EntityModelLayerRegistry.registerModelLayer(TALL_PIG, TallPigEntityModel::getPigTexturedModelData)
-        EntityModelLayerRegistry.registerModelLayer(TALL_PIG_SADDLE, TallPigEntityModel::getSaddleTexturedModelData)
+        // ModelLayerRegistry.registerModelLayer(LONG_PIG, LongPigEntityModel::getTexturedModelData)
+        // ModelLayerRegistry.registerModelLayer(TALL_PIG, TallPigEntityModel::getPigTexturedModelData)
+        // ModelLayerRegistry.registerModelLayer(TALL_PIG_SADDLE, TallPigEntityModel::getSaddleTexturedModelData)
     }
 }

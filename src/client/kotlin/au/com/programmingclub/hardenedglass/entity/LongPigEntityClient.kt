@@ -1,91 +1,115 @@
 package au.com.programmingclub.hardenedglass.entity
 
-import au.com.programmingclub.hardenedglass.MOD_ID
-import net.minecraft.client.model.Dilation
-import net.minecraft.client.model.ModelData
-import net.minecraft.client.model.ModelPart
-import net.minecraft.client.model.ModelPartBuilder
-import net.minecraft.client.model.ModelTransform
-import net.minecraft.client.model.TexturedModelData
-import net.minecraft.client.render.entity.EntityRendererFactory
-import net.minecraft.client.render.entity.MobEntityRenderer
-import net.minecraft.client.render.entity.feature.SaddleFeatureRenderer
-import net.minecraft.client.render.entity.model.EntityModelLayers
-import net.minecraft.client.render.entity.model.EntityModelPartNames
-import net.minecraft.client.render.entity.model.QuadrupedEntityModel
-import net.minecraft.util.Identifier
+import au.com.programmingclub.hardenedglass.HardenedGlass
+import net.minecraft.client.model.QuadrupedModel
+import net.minecraft.client.model.geom.ModelLayers
+import net.minecraft.client.model.geom.ModelPart
+import net.minecraft.client.model.geom.PartNames
+import net.minecraft.client.model.geom.PartPose
+import net.minecraft.client.model.geom.builders.CubeDeformation
+import net.minecraft.client.model.geom.builders.CubeListBuilder
+import net.minecraft.client.model.geom.builders.LayerDefinition
+import net.minecraft.client.model.geom.builders.MeshDefinition
+import net.minecraft.client.model.geom.builders.PartDefinition
+import net.minecraft.client.renderer.entity.EntityRendererProvider
+import net.minecraft.client.renderer.entity.MobRenderer
+import net.minecraft.client.renderer.entity.layers.SimpleEquipmentLayer
+import net.minecraft.client.renderer.entity.state.LivingEntityRenderState
+import net.minecraft.client.resources.model.EquipmentClientInfo
+import net.minecraft.resources.Identifier
+import net.minecraft.world.entity.EquipmentSlot
+import net.minecraft.world.item.ItemStack
 
 class LongPigEntityModel(root: ModelPart) :
     // TODO: Fix child head scale and position
-    QuadrupedEntityModel<LongPigEntity>(root, false, 4.0F, 4.0F, 2.0F, 2.0F, 24) {
+    QuadrupedModel<LongPigRenderState>(root) {
+    // false, 4.0F, 4.0F, 2.0F, 2.0F, 24
+    // boolean headScaled, float childHeadYOffset, float childHeadZOffset, float invertedChildHeadScale, float invertedChildBodyScale, int childBodyYOffset
     companion object {
-        fun getTexturedModelData(): TexturedModelData {
-            val modelData = ModelData()
-            val modelPartData = modelData.root
+        fun getTexturedModelData(): LayerDefinition {
+            val modelData = MeshDefinition()
+            val modelPartData: PartDefinition = modelData.root
 
-            modelPartData.addChild(
-                EntityModelPartNames.HEAD,
-                ModelPartBuilder.create().uv(0, 0).cuboid(-4.0f, -4.0f, -8.0f, 8.0f, 8.0f, 8.0f, Dilation.NONE)
-                    .uv(16, 16).cuboid(-2.0f, 0.0f, -9.0f, 4.0f, 3.0f, 1.0f, Dilation.NONE),
-                ModelTransform.pivot(0.0f, 12.0f, -14.0f)
+            modelPartData.addOrReplaceChild(
+                PartNames.HEAD,
+                CubeListBuilder.create().texOffs(0, 0).addBox(-4.0f, -4.0f, -8.0f, 8.0f, 8.0f, 8.0f, CubeDeformation.NONE)
+                    .texOffs(16, 16).addBox(-2.0f, 0.0f, -9.0f, 4.0f, 3.0f, 1.0f, CubeDeformation.NONE),
+                PartPose.offset(0.0f, 12.0f, -14.0f)
             )
 
-            modelPartData.addChild(
-                EntityModelPartNames.BODY,
-                ModelPartBuilder.create().uv(28, 8).cuboid(-5.0f, -9.0f, -7.0f, 10.0f, 32.0f, 8.0f, Dilation.NONE),
-                ModelTransform.of(0.0f, 11.0f, -7.0f, (Math.PI / 2).toFloat(), 0.0f, 0.0f)
+            modelPartData.addOrReplaceChild(
+                PartNames.BODY,
+                CubeListBuilder.create().texOffs(28, 8).addBox(-5.0f, -9.0f, -7.0f, 10.0f, 32.0f, 8.0f, CubeDeformation.NONE),
+                PartPose.offsetAndRotation(0.0f, 11.0f, -7.0f, (Math.PI / 2).toFloat(), 0.0f, 0.0f)
             )
 
             val modelPartBuilder =
-                ModelPartBuilder.create().uv(0, 16).cuboid(-2.0f, 0.0f, -2.0f, 4.0f, 6.0f, 4.0f, Dilation.NONE)
-            modelPartData.addChild(
-                EntityModelPartNames.RIGHT_HIND_LEG,
+                CubeListBuilder.create().texOffs(0, 16).addBox(-2.0f, 0.0f, -2.0f, 4.0f, 6.0f, 4.0f, CubeDeformation.NONE)
+            modelPartData.addOrReplaceChild(
+                PartNames.RIGHT_HIND_LEG,
                 modelPartBuilder,
-                ModelTransform.pivot(-3.0f, 18.0f, 15.0f)
+                PartPose.offset(-3.0f, 18.0f, 15.0f)
             )
-            modelPartData.addChild(
-                EntityModelPartNames.LEFT_HIND_LEG,
+            modelPartData.addOrReplaceChild(
+                PartNames.LEFT_HIND_LEG,
                 modelPartBuilder,
-                ModelTransform.pivot(3.0f, 18.0f, 15.0f)
+                PartPose.offset(3.0f, 18.0f, 15.0f)
             )
-            modelPartData.addChild(
-                EntityModelPartNames.RIGHT_FRONT_LEG,
+            modelPartData.addOrReplaceChild(
+                PartNames.RIGHT_FRONT_LEG,
                 modelPartBuilder,
-                ModelTransform.pivot(-3.0f, 18.0f, -13.0f)
+                PartPose.offset(-3.0f, 18.0f, -13.0f)
             )
-            modelPartData.addChild(
-                EntityModelPartNames.LEFT_FRONT_LEG,
+            modelPartData.addOrReplaceChild(
+                PartNames.LEFT_FRONT_LEG,
                 modelPartBuilder,
-                ModelTransform.pivot(3.0f, 18.0f, -13.0f)
+                PartPose.offset(3.0f, 18.0f, -13.0f)
             )
 
-            return TexturedModelData.of(modelData, 64, 64)
+            return LayerDefinition.create(modelData, 64, 64)
         }
     }
 }
 
-class LongPigEntityRenderer :
-    MobEntityRenderer<LongPigEntity, LongPigEntityModel> {
+class LongPigRenderState : LivingEntityRenderState() {
+    var saddle: ItemStack = ItemStack.EMPTY
+}
+
+/*class LongPigEntityRenderer :
+    MobRenderer<LongPigEntity, LongPigRenderState, LongPigEntityModel> {
     companion object {
-        private val TEXTURE = Identifier(MOD_ID, "textures/entity/long_pig/long_pig.png")
+        private val TEXTURE: Identifier = HardenedGlass.id("textures/entity/long_pig/long_pig.png")
     }
 
-    constructor(context: EntityRendererFactory.Context) : super(
+    constructor(context: EntityRendererProvider.Context) : super(
         context,
-        LongPigEntityModel(context.getPart(HardenedGlassModelLayers.LONG_PIG)),
+        LongPigEntityModel(context.bakeLayer(HardenedGlassModelLayers.LONG_PIG)),
         // Figure out this parameter
         0.5f
     ) {
-        this.addFeature(
-            SaddleFeatureRenderer(
+        this.addLayer(
+            SimpleEquipmentLayer(
                 this,
-                LongPigEntityModel(context.getPart(EntityModelLayers.PIG_SADDLE)),
-                Identifier("textures/entity/pig/pig_saddle.png")
+                context.equipmentRenderer,
+                EquipmentClientInfo.LayerType.PIG_SADDLE,
+                { state -> state.saddle },
+                LongPigEntityModel(context.bakeLayer(ModelLayers.PIG_SADDLE)),
+                null
             )
         )
+
     }
 
-    override fun getTexture(entity: LongPigEntity): Identifier {
+    override fun getTextureLocation(state: LongPigRenderState): Identifier {
         return TEXTURE
     }
-}
+
+    override fun createRenderState(): LongPigRenderState {
+        return LongPigRenderState()
+    }
+
+    override fun extractRenderState(entity: LongPigEntity, state: LongPigRenderState, partialTicks: Float) {
+        super.extractRenderState(entity, state, partialTicks)
+        state.saddle = entity.getItemBySlot(EquipmentSlot.SADDLE).copy()
+    }
+}*/
