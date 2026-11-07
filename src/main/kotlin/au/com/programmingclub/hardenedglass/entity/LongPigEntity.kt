@@ -15,7 +15,8 @@ class LongPigEntity(entityType: EntityType<LongPigEntity>, level: Level) : Pig(e
     companion object {
         // TODO: Add additional difference to vanilla pig?
         fun createMobAttribute(): AttributeSupplier.Builder {
-            return createAttributes().add(Attributes.MOVEMENT_SPEED, .3)
+            return createAttributes()
+                .add(Attributes.MOVEMENT_SPEED, .3)
         }
     }
 

@@ -1,10 +1,6 @@
 package au.com.programmingclub.hardenedglass
 
 import net.fabricmc.fabric.api.creativetab.v1.CreativeModeTabEvents
-import net.minecraft.core.Registry
-import net.minecraft.core.registries.BuiltInRegistries
-import net.minecraft.core.registries.Registries
-import net.minecraft.resources.ResourceKey
 import net.minecraft.world.effect.MobEffectInstance
 import net.minecraft.world.effect.MobEffects
 import net.minecraft.world.food.FoodProperties
@@ -25,8 +21,8 @@ data object BaconItems {
         }
     }
 
-    @JvmField
-    val LONG_BACON: Item = registerItem(
+    val LONG_BACON: Item = HardenedGlass.register(
+        ::Item,
         Properties().food(
             FoodProperties.Builder()
                 .nutrition(2)
@@ -43,8 +39,8 @@ data object BaconItems {
         "long_bacon",
     )
 
-    @JvmField
-    val RAW_LONG_BACON: Item = registerItem(
+    val RAW_LONG_BACON: Item = HardenedGlass.register(
+        ::Item,
         Properties().food(
             FoodProperties.Builder()
                 .nutrition(2)
@@ -61,8 +57,8 @@ data object BaconItems {
         "raw_long_bacon",
     )
 
-    @JvmField
-    val TALL_BACON: Item = registerItem(
+    val TALL_BACON: Item = HardenedGlass.register(
+        ::Item,
         Properties().food(
             FoodProperties.Builder()
                 .nutrition(2)
@@ -80,8 +76,8 @@ data object BaconItems {
     )
 
     // TODO: Use a different effect than cooked tall bacon
-    @JvmField
-    val RAW_TALL_BACON: Item = registerItem(
+    val RAW_TALL_BACON: Item = HardenedGlass.register(
+        ::Item,
         Properties().food(
             FoodProperties.Builder()
                 .nutrition(2)
@@ -97,11 +93,4 @@ data object BaconItems {
         ),
         "raw_tall_bacon",
     )
-
-    fun registerItem(properties: Properties, identifier: String): Item {
-        val key: ResourceKey<Item> = ResourceKey.create(Registries.ITEM, HardenedGlass.id(identifier))
-        val item = Item(properties.setId(key))
-        return Registry.register(BuiltInRegistries.ITEM, key, item)
-    }
-
 }

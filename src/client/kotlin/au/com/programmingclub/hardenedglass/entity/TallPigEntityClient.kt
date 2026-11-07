@@ -12,12 +12,8 @@ import net.minecraft.client.model.geom.builders.MeshDefinition
 import net.minecraft.client.model.geom.builders.PartDefinition
 import net.minecraft.client.renderer.entity.EntityRendererProvider
 import net.minecraft.client.renderer.entity.MobRenderer
-import net.minecraft.client.renderer.entity.layers.SimpleEquipmentLayer
 import net.minecraft.client.renderer.entity.state.LivingEntityRenderState
-import net.minecraft.client.resources.model.EquipmentClientInfo
 import net.minecraft.resources.Identifier
-import net.minecraft.world.entity.EquipmentSlot
-import net.minecraft.world.item.ItemStack
 
 class TallPigEntityModel(root: ModelPart) :
     // TODO: Fix child head scale and position
@@ -80,10 +76,10 @@ class TallPigEntityModel(root: ModelPart) :
 }
 
 class TallPigRenderState : LivingEntityRenderState() {
-    var saddle: ItemStack = ItemStack.EMPTY
+    // var saddle: ItemStack = ItemStack.EMPTY
 }
 
-/*class TallPigEntityRenderer :
+class TallPigEntityRenderer :
     MobRenderer<TallPigEntity, TallPigRenderState, TallPigEntityModel> {
     companion object {
         private val TEXTURE = HardenedGlass.id("textures/entity/tall_pig/tall_pig.png")
@@ -95,7 +91,7 @@ class TallPigRenderState : LivingEntityRenderState() {
         // Figure out this parameter
         0.5f
     ) {
-        this.addLayer(
+        /*this.addLayer(
             SimpleEquipmentLayer(
                 this,
                 context.equipmentRenderer,
@@ -105,7 +101,7 @@ class TallPigRenderState : LivingEntityRenderState() {
                 null
             )
             // TODO: Figure out where to give the file path: HardenedGlass.id("textures/entity/tall_pig/tall_pig_saddle.png")
-        )
+        )*/
     }
 
     override fun getTextureLocation(state: TallPigRenderState): Identifier {
@@ -116,8 +112,8 @@ class TallPigRenderState : LivingEntityRenderState() {
         return TallPigRenderState()
     }
 
-    override fun extractRenderState(entity: TallPigEntity, state: TallPigRenderState, partialTicks: Float) {
+    /*override fun extractRenderState(entity: TallPigEntity, state: TallPigRenderState, partialTicks: Float) {
         super.extractRenderState(entity, state, partialTicks)
         state.saddle = entity.getItemBySlot(EquipmentSlot.SADDLE).copy()
-    }
-}*/
+    }*/
+}

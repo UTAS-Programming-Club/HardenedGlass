@@ -2,7 +2,6 @@ package au.com.programmingclub.hardenedglass.entity
 
 import au.com.programmingclub.hardenedglass.HardenedGlass
 import net.minecraft.client.model.QuadrupedModel
-import net.minecraft.client.model.geom.ModelLayers
 import net.minecraft.client.model.geom.ModelPart
 import net.minecraft.client.model.geom.PartNames
 import net.minecraft.client.model.geom.PartPose
@@ -13,12 +12,8 @@ import net.minecraft.client.model.geom.builders.MeshDefinition
 import net.minecraft.client.model.geom.builders.PartDefinition
 import net.minecraft.client.renderer.entity.EntityRendererProvider
 import net.minecraft.client.renderer.entity.MobRenderer
-import net.minecraft.client.renderer.entity.layers.SimpleEquipmentLayer
 import net.minecraft.client.renderer.entity.state.LivingEntityRenderState
-import net.minecraft.client.resources.model.EquipmentClientInfo
 import net.minecraft.resources.Identifier
-import net.minecraft.world.entity.EquipmentSlot
-import net.minecraft.world.item.ItemStack
 
 class LongPigEntityModel(root: ModelPart) :
     // TODO: Fix child head scale and position
@@ -72,10 +67,10 @@ class LongPigEntityModel(root: ModelPart) :
 }
 
 class LongPigRenderState : LivingEntityRenderState() {
-    var saddle: ItemStack = ItemStack.EMPTY
+    // var saddle: ItemStack = ItemStack.EMPTY
 }
 
-/*class LongPigEntityRenderer :
+class LongPigEntityRenderer :
     MobRenderer<LongPigEntity, LongPigRenderState, LongPigEntityModel> {
     companion object {
         private val TEXTURE: Identifier = HardenedGlass.id("textures/entity/long_pig/long_pig.png")
@@ -87,7 +82,7 @@ class LongPigRenderState : LivingEntityRenderState() {
         // Figure out this parameter
         0.5f
     ) {
-        this.addLayer(
+        /*this.addLayer(
             SimpleEquipmentLayer(
                 this,
                 context.equipmentRenderer,
@@ -96,8 +91,7 @@ class LongPigRenderState : LivingEntityRenderState() {
                 LongPigEntityModel(context.bakeLayer(ModelLayers.PIG_SADDLE)),
                 null
             )
-        )
-
+        )*/
     }
 
     override fun getTextureLocation(state: LongPigRenderState): Identifier {
@@ -108,8 +102,8 @@ class LongPigRenderState : LivingEntityRenderState() {
         return LongPigRenderState()
     }
 
-    override fun extractRenderState(entity: LongPigEntity, state: LongPigRenderState, partialTicks: Float) {
+    /*override fun extractRenderState(entity: LongPigEntity, state: LongPigRenderState, partialTicks: Float) {
         super.extractRenderState(entity, state, partialTicks)
         state.saddle = entity.getItemBySlot(EquipmentSlot.SADDLE).copy()
-    }
-}*/
+    }*/
+}
