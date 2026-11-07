@@ -1,9 +1,9 @@
 {
   "type": "minecraft:blasting",
+  "cookingtime": 200,
+  "experience": 0.1,
   "ingredient": "minecraft:glass",
   "result": {
     "id": "hardenedglass:hardened_glass"
-  },
-  "experience": 0.1,
-  "cookingtime": 200
+  }
 }
